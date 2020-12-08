@@ -1,23 +1,45 @@
 {
   "name": "sabs",
+  "productName": "sabs",
   "version": "0.1.0",
   "private": true,
+  "author": "Ruben Dimas",
+  "homepage": "./",
+  "build": {
+    "files": [
+      "./build/**/*",
+      "./node_modules/**/*",
+      "./electron/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "repo": "sabs",
+      "owner": "rdimas-ut"
+    }
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
-    "@testing-library/user-event": "^12.2.2",
+    "@testing-library/user-event": "^12.5.0",
+    "cross-env": "^7.0.3",
+    "electron-is-dev": "^1.2.0",
+    "intuit-oauth": "^3.0.2",
+    "node-quickbooks": "^2.0.37",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
-  "main": "main.js",
+  "main": "./electron/main.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-react": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\""
+    "electron-react-mac": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-react-win": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\" ",
+    "build-electron-win": "mkdir build/src && robocopy electron build/electron /S & robocopy src/shared build/src/shared /S",
+    "package-win": "electron-builder build --win -c.extraMetadata.main=electron/main.js --publish never"
   },
   "eslintConfig": {
     "extends": [
@@ -39,8 +61,9 @@
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
-    "electron": "^11.0.3",
+    "electron": "^11.0.4",
     "electron-builder": "^22.9.1",
+    "electron-rebuild": "^2.3.4",
     "wait-on": "^5.2.0"
   }
 }
