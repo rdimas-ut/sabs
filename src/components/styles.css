@@ -26,9 +26,15 @@
     color: white;
 }
 
-.sidebar button:focus {
+.sidebar button:focus,
+.sidebar .selected:focus {
     outline:none;
     box-shadow: none;    
+}
+
+.sidebar .selected {
+    background-color: #555;
+    color: white;
 }
 
 /* Page content. The value of the margin-left property should match the value of the sidebar's width property */

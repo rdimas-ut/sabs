@@ -4,14 +4,19 @@ import SABSLogo from "./SABS Logo.svg"
 
 class Header extends Component {
     render() { 
+        var homeButtonClass = this.props.tab === "home" ? "selected" : "button";
+        var customerButtonClass = this.props.tab === "customer" ? "selected" : "button";
+        var vendorButtonClass = this.props.tab === "vendor" ? "selected" : "button";
+        var dashboardButtonClass = this.props.tab === "dashboard" ? "selected" : "button";
+
         return (
             <div className="sidebar">
-                <img class="displayed" src={SABSLogo} alt="Some text"/>
+                <img className="displayed" src={SABSLogo} alt="Some text"/>
 
-                <button type="button">Home</button>
-                <button type="button">Customers</button>
-                <button type="button">Vendors</button>
-                <button type="button">Dashboard</button>
+                <button className={homeButtonClass} onClick={() => this.props.onTab("home")} >Home</button>
+                <button className={customerButtonClass} onClick={() => this.props.onTab("customer")} >Customers</button>
+                <button className={vendorButtonClass} onClick={() => this.props.onTab("vendor")} >Vendors</button>
+                <button className={dashboardButtonClass} onClick={() => this.props.onTab("dashboard")} >Dashboard</button>
             </div>
           );
     }
