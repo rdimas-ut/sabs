@@ -1,4 +1,5 @@
 const OAuthClient = require('intuit-oauth');
+const store = require('./store');
 
 // Instance of client
 var oauthClient = new OAuthClient({
@@ -13,31 +14,38 @@ var scopes = [d.Accounting, d.Payment, d.OpenId, d.Profile, d.Email, d.Phone, d.
 
 function createAuthUrl() {
   // AuthorizationUri
-  return oauthClient.authorizeUri({scope:scopes});
+  var rty =oauthClient.authorizeUri({scope:scopes}) 
+  console.log(rty)
+  return rty;
 };
 
-const testResponse = function (req, res) {
+// Handles he local redirect request received back from azure  
+const handleAuth = function (req, res) {
   const myURL = new URL(req.url, "http://localhost:801");
-  var paramArray = new Array(4);
-  var params = ["code", "realmId", "state", "error"];
-  var returnString = "Hi, this is my first server\n";
-  var i = 0
-
-  returnString += myURL.pathname + "\n";
   const myURLSearch = new URLSearchParams(myURL.search);
-  for (const param of params) {
-    returnString += param + "=" + myURLSearch.get(param) + "\n";
-    paramArray[i] = myURLSearch.get(param);
-    i += 1;
+  const myError = myURLSearch.get("error");
+
+  // Evaluate response
+  res.writeHead(200);
+  if (myURL.pathname === "/api/oauth/" && myError === null) {
+    // exchange the code a access_toke and refresh_token
+    oauthClient.createToken(req.url)
+    .then(function(authResponse) {
+        const responseJSON = authResponse.getJson();
+        store.qboAuthData.set("access_token.value", responseJSON.access_token)
+    })
+    .catch(function(e) {
+        store.qboAuthData.set("access_token.value", null);
+    });
+
+    res.end("Authentification was succesful. You may now close this window.");
+  } else {
+    res.end("Authentification failed. Please try again. You may now close this window")
   }
 
-  // Check if the path and parameters are correct api/oauth and code realmId 
-  // If they are then exchange codes for keys and if not then return header file sortof.
-
-  res.writeHead(200);
-  res.end(returnString);
 };
 
 
 exports.createAuthUrl = createAuthUrl;
 exports.testResponse = testResponse;
+exports.handleAuth = handleAuth;

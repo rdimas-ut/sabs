@@ -4,10 +4,8 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 // const quickbooks = require('node-quickbooks');
 const http = require("http");
-const settings = require('./settings')
 const qbo = require('./qbo')
-
-const server = http.createServer(qbo.testResponse);
+const server = http.createServer(qbo.handleAuth);
 
 server.listen(801, 'localhost', () => {
    console.log('server is tunning');
@@ -38,8 +36,6 @@ ipcMain.handle('openAuth', () => {
   })
   winAuth.loadURL(qbo.createAuthUrl())
 });
-
-// console.log(test.qbo_auth.get("key"));
 
 function createWindow () {
   const win = new BrowserWindow({
