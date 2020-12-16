@@ -2,14 +2,21 @@ import React, { Component } from 'react';
 
 class Home extends Component {
     state = {  }
+
+    renderLogIn = () => {
+        if (this.props.isAccessTokenValid === true) {
+            return <button onClick={this.props.qboSignOut}>Sign Out</button>
+        } else {
+            return <button onClick={this.props.qboSignIn}>Sign In</button>
+        }
+    }
+
     render() { 
         return ( 
-            <p>
-                Gonna include some text in here to make sure that this
-                does indeed display something unlike other methods
-                this is realy just some sample text to makwe sure that that
-                the react compnent works
-            </p>
+            <div>
+                <h1> This page will facilitate signing into quickbooks. </h1>
+                {this.renderLogIn()}
+            </div>
          );
     }
 }

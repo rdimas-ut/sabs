@@ -1,23 +1,30 @@
 import "./styles.css"
 import React, { Component } from 'react';
-const { ipcRenderer } = window.require('electron')
+import Home from "./HomeTab"
+import Customer from "./CustomerTab"
+import Vendor from "./VendorTab"
+import Dashboard from "./DashboardTab"
 
 class Content extends Component {
     state = {  }
 
-    onAuth() {
-        ipcRenderer.invoke('openAuth');
-        console.log("is htis getting triggered");
+    renderContent() {
+        if (this.props.tab === "home") {
+            return <Home isAccessTokenValid={this.props.isAccessTokenValid} isSignedIn={this.props.isSignedIn} qboSignIn={this.props.qboSignIn} qboSignOut={this.props.qboSignOut} />
+        } else if (this.props.tab === "customer") {
+            return <Customer isAccessTokenValid={this.props.isAccessTokenValid} isSignedIn={this.props.isSignedIn} />
+        } else if (this.props.tab === "vendor") {
+            return <Vendor isAccessTokenValid={this.props.isAccessTokenValid} isSignedIn={this.props.isSignedIn} />
+        } else if (this.props.tab === "dashboard") {
+            return <Dashboard isAccessTokenValid={this.props.isAccessTokenValid} isSignedIn={this.props.isSignedIn} />
+        }
     }
 
     // Condioinally render somethng here dependeing on the props passed
     render() { 
         return ( 
         <div className="content">
-            <h1>Hello, how are you? Fine Thank you. I wish I were a bird.</h1>
-            <h2> {this.props.tab} </h2>
-            <h2>This is just to show hot reload</h2>
-            <button onClick={this.onAuth}> Hey how is it going</button>
+            {this.renderContent()}
         </div>
          );
     }

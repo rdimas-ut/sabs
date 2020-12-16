@@ -2,30 +2,34 @@ const Store = require('electron-store');
 
 // Defines the file that saves the acess and refreash tokens for qbo
 const schema = {
+    token_type: {
+        type: "string",
+        default: "bearer"
+    }, 
     access_token: {
-        value: {
-            type: "string",
-            default: null
-        },
-        expires_in: {
-            type: "number"
-        }
+        type: "string",
+        default: ""
+    },
+    expires_in: {
+        type: "integer",
+        default: 100
     },
     refresh_token: {
-        value: {
-            type: "string"
-        },
-        expires_in: {
-            type: "number"
-        }
+        type: "string",
+        default: ""
     },
-    dbPath : {
-        type: "string"
+    x_refresh_token_expires_in: {
+        type: "integer",
+        default: 100
+    },
+    createdAt: {
+        type: "integer",
+        default: Date.now()
     }
-  };
+}
 
-const name = "qboAuthData";
+const name = "qboAuthClientData";
 const encryptionKey = "VO0KrY1&-3$$h`K";
-const qboAuthData = new Store({schema, name, encryptionKey});
+const qboAuthClientData = new Store({schema, name, encryptionKey});
 
-exports.qboAuthData = qboAuthData
+exports.qboAuthClientData = qboAuthClientData

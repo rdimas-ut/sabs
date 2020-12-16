@@ -5,10 +5,10 @@ const path = require('path');
 // const quickbooks = require('node-quickbooks');
 const http = require("http");
 const qbo = require('./qbo')
+
 const server = http.createServer(qbo.handleAuth);
 
 server.listen(801, 'localhost', () => {
-   console.log('server is tunning');
 });
 
 app.whenReady().then(createWindow)
@@ -25,7 +25,11 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.handle('openAuth', () => {
+ipcMain.handle('isAccessTokenValid', () => {
+  return qbo.isAccessTokenValid();
+})
+
+ipcMain.handle('qboSignIn', async () => {
   const winAuth = new BrowserWindow({
     width: 800,
     height: 600,
@@ -34,15 +38,27 @@ ipcMain.handle('openAuth', () => {
     },
     icon:'./electron/SABS logo - Square.jpeg' 
   })
-  winAuth.loadURL(qbo.createAuthUrl())
+  winAuth.loadURL(qbo.createAuthUrl());
 });
+
+ipcMain.handle('qboSignOut', () => {
+  console.log("some stuff in here");
+  // revoke tokens and clear aboAuthClientData;
+})
+
+
+ipcMain.handle('refreshAccessToken', () => {
+  qbo.tokenRefresh();
+});
+
 
 function createWindow () {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true,
     },
     icon:'./electron/SABS Logo.png' 
   })
