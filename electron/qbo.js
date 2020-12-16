@@ -1,4 +1,3 @@
-const { NodeEventEmitter } = require('electron');
 const OAuthClient = require('intuit-oauth');
 const store = require('./store');
 
@@ -15,7 +14,9 @@ var oauthClient = new OAuthClient({
 var d = OAuthClient.scopes
 var scopes = [d.Accounting, d.Payment, d.OpenId, d.Profile, d.Email, d.Phone, d.Address]
 
-function tokenRefresh() {
+function refreshAccessToken() {
+  console.log("refreshAccessToken to be" + JSON.stringify(oauthClient.getToken().getToken()));
+  console.log(store.qboAuthClientData.store)
   oauthClient.refresh()
   .then(function(authResponse) {
     const responseJSON = authResponse.getJson();
@@ -23,16 +24,24 @@ function tokenRefresh() {
     store.qboAuthClientData.set(responseJSON);
   })
   .catch(function(e) {
+    console.log("There was an error in refreshAccessToken")
     store.qboAuthClientData.clear();
   })
 
-  // if (store.qboAuthClientData.get("refresh_token") !== "") {
-  //   signIn = true;
-  //   return true
-  // } else {
-  //   signIn = false;
-  //   return false
-  // }
+  console.log("this is the regular one" + oauthClient.getToken())
+}
+
+function revokeAccessToken() {
+  oauthClient
+  .revoke()
+  .then(function (authResponse) {
+    console.log('Tokens revoked : ' + JSON.stringify(authResponse.getJson()));
+  })
+  .catch(function (e) {
+    console.error('The error message is :' + e.originalMessage);
+    console.error(e.intuit_tid);
+  });
+  store.qboAuthClientData.clear();
 }
 
 function isAccessTokenValid() {
@@ -57,23 +66,22 @@ const handleAuth = function (req, res) {
     .then(function(authResponse) {
         const responseJSON = authResponse.getJson();
         store.qboAuthClientData.set("createdAt", Date.now());
+        store.qboAuthClientData.set("realmId", myURLSearch.get("realmId"));
         store.qboAuthClientData.set(responseJSON);    
     })
     .catch(function(e) {
         store.qboAuthClientData.clear();
-        
     });
     
     res.end("Authentification was succesful. You may now close this window.");
   } else {
     res.end("Authentification failed. Please try again. You may now close this window")
   }
-
-  console.log("firsyt");
 };
 
 
+exports.refreshAccessToken = refreshAccessToken;
+exports.revokeAccessToken = revokeAccessToken;
+exports.isAccessTokenValid = isAccessTokenValid;
 exports.createAuthUrl = createAuthUrl;
 exports.handleAuth = handleAuth;
-exports.tokenRefresh = tokenRefresh;
-exports.isAccessTokenValid = isAccessTokenValid;

@@ -36,19 +36,18 @@ ipcMain.handle('qboSignIn', async () => {
     webPreferences: {
       nodeIntegration: false
     },
-    icon:'./electron/SABS logo - Square.jpeg' 
+    icon:'./electron/SABS Logo.png' 
   })
   winAuth.loadURL(qbo.createAuthUrl());
 });
 
 ipcMain.handle('qboSignOut', () => {
-  console.log("some stuff in here");
-  // revoke tokens and clear aboAuthClientData;
+  qbo.revokeAccessToken();
 })
 
 
 ipcMain.handle('refreshAccessToken', () => {
-  qbo.tokenRefresh();
+  qbo.refreshAccessToken();
 });
 
 
