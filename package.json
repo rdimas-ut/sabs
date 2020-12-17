@@ -11,6 +11,9 @@
       "./node_modules/**/*",
       "./electron/**/*"
     ],
+    "directories": {
+      "buildResources": "eb_build"
+    },
     "publish": {
       "provider": "github",
       "repo": "sabs",
@@ -22,12 +25,14 @@
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
     "better-sqlite3": "^7.1.1",
+    "bootstrap": "^4.5.3",
     "cross-env": "^7.0.3",
     "electron-is-dev": "^1.2.0",
     "electron-store": "^6.0.1",
     "intuit-oauth": "^3.0.2",
     "node-quickbooks": "^2.0.37",
     "react": "^17.0.1",
+    "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"

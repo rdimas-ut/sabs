@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
+const { ipcRenderer } = window.require('electron');
 
 class Home extends Component {
     state = {  }
 
     renderLogIn = () => {
-        if (this.props.isAccessTokenValid === true) {
-            return <button onClick={this.props.qboSignOut}>Sign Out</button>
+        if (this.props.isAccessTokenValid) {
+            return <button onClick={this.props.qboSignOut} className="btn btn-warning">Sign Out</button>
         } else {
-            return <button onClick={this.props.qboSignIn}>Sign In</button>
+            return <button onClick={this.props.qboSignIn} className="btn btn-primary">Sign In</button>
         }
     }
 

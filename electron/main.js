@@ -50,6 +50,11 @@ ipcMain.handle('refreshAccessToken', () => {
   qbo.refreshAccessToken();
 });
 
+ipcMain.handle('getAllCustomers', ()=> {
+  console.log('getAllCustomers');
+  
+});
+
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -65,6 +70,6 @@ function createWindow () {
   if (isDev) {
     win.loadURL('http://localhost:3000')
   } else {
-    win.loadFile(`file://${path.join(__dirname, '../build/index.html')}`)
+    win.loadURL(`file://${path.join(__dirname, '../build/index.html')}`)
   }
 };

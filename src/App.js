@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import Header from "./components/Header"
 import Content from "./components/Content"
+import "bootstrap/dist/css/bootstrap.css";
 const { ipcRenderer } = window.require('electron');
+
 
 class App extends Component {
   state = {
