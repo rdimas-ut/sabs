@@ -18,11 +18,13 @@ var qboClient = new Quickbooks({
   tokenSecret: false,
   realmId: store.qboAuthClientData.get("realmId"),
   useSandbox: true,
-  debug: true,
+  debug: false,
   minorversion: null,
   oauthversion: '2.0',
   refreshToken: store.qboAuthClientData.get("refresh_token")
 });
+
+var allCustomers;
 
 // Defines scopes use for authentification
 var d = OAuthClient.scopes
@@ -67,7 +69,11 @@ function createAuthUrl() {
 };
 
 function getAllCustomers() {
-  
+  qboClient.findCustomers({
+    fetchAll: true
+  }, (e, customers) => {
+    console.log(customers.QueryResponse.Customer);
+  })
 }
 
 // Handles he local redirect request received back from azure  
@@ -84,11 +90,11 @@ const handleAuth = function (req, res) {
     .then(function(authResponse) {
         const responseJSON = authResponse.getJson();
         // Sets the values of tokens and realmId to persistent storage
+        store.qboAuthClientData.set(responseJSON);   
         store.qboAuthClientData.set("createdAt", Date.now());
         store.qboAuthClientData.set("realmId", myURLSearch.get("realmId"));
-        store.qboAuthClientData.set(responseJSON);    
         // Sets the values of tokens and realmId to qboClient
-        qboClient.realmId = responseJSON.realmId;
+        qboClient.realmId = myURLSearch.get("realmId");
         qboClient.token = responseJSON.access_token;
         qboClient.refreshToken = responseJSON.refresh_token; 
     })
@@ -107,3 +113,5 @@ exports.revokeAccessToken = revokeAccessToken;
 exports.isAccessTokenValid = isAccessTokenValid;
 exports.createAuthUrl = createAuthUrl;
 exports.handleAuth = handleAuth;
+exports.getAllCustomers = getAllCustomers;
+exports.allCustomers = allCustomers;

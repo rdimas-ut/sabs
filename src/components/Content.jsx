@@ -10,7 +10,7 @@ class Content extends Component {
 
     renderContent() {
         if (this.props.tab === "home") {
-            return <Home isAccessTokenValid={this.props.isAccessTokenValid} qboSignIn={this.props.qboSignIn} qboSignOut={this.props.qboSignOut} />
+            return <Home isAccessTokenValid={this.props.isAccessTokenValid} NewSignIn={this.props.NewSignIn} qboSignIn={this.props.qboSignIn} qboSignOut={this.props.qboSignOut} />
         } else if (this.props.tab === "customer") {
             return <Customer isAccessTokenValid={this.props.isAccessTokenValid} />
         } else if (this.props.tab === "vendor") {

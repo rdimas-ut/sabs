@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-const { ipcRenderer } = window.require('electron');
 
 class Home extends Component {
     state = {  }
@@ -17,6 +16,7 @@ class Home extends Component {
             <div>
                 <h1> This page will facilitate signing into quickbooks. </h1>
                 {this.renderLogIn()}
+                <button onClick={this.props.NewSignIn} className="btn btn-primary" >New Sign In</button>
             </div>
          );
     }

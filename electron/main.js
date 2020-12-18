@@ -3,8 +3,9 @@ const { ipcMain } = require('electron')
 const isDev = require('electron-is-dev');   
 const path = require('path');
 // const quickbooks = require('node-quickbooks');
-const http = require("http");
-const qbo = require('./qbo')
+const https = require("https");
+const http = require('http');
+const qbo = require('./qbo');
 
 const server = http.createServer(qbo.handleAuth);
 
@@ -29,7 +30,7 @@ ipcMain.handle('isAccessTokenValid', () => {
   return qbo.isAccessTokenValid();
 })
 
-ipcMain.handle('qboSignIn', async () => {
+ipcMain.handle('qboSignIn', () => {
   const winAuth = new BrowserWindow({
     width: 800,
     height: 600,
@@ -39,6 +40,33 @@ ipcMain.handle('qboSignIn', async () => {
     icon:'./electron/SABS Logo.png' 
   })
   winAuth.loadURL(qbo.createAuthUrl());
+});
+
+ipcMain.handle('NewSignIn', () => {
+
+  https.get('https://sabstestfunc.azurewebsites.net/api/QBORequestAuth?', (res) => {
+    const { statusCode } = res;
+  
+    res.setEncoding('utf8');
+    let rawData = '';
+    res.on('data', (chunk) => {
+      console.log(`BODY: ${chunk}`);
+      rawData += chunk;
+    });
+  
+    res.on('end', () => {
+      const winAuth = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+          nodeIntegration: false
+        },
+        icon:'./electron/SABS Logo.png' 
+      })
+      winAuth.loadURL(rawData);
+    });
+  })
+  
 });
 
 ipcMain.handle('qboSignOut', () => {
@@ -51,8 +79,7 @@ ipcMain.handle('refreshAccessToken', () => {
 });
 
 ipcMain.handle('getAllCustomers', ()=> {
-  console.log('getAllCustomers');
-  
+   qbo.getAllCustomers();
 });
 
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+const { ipcRenderer } = window.require('electron');
 
 class Customer extends Component {
     state = {  }
@@ -10,10 +11,15 @@ class Customer extends Component {
         }
     }
 
+    getAllCustomers = () => {
+        ipcRenderer.invoke('getAllCustomers');
+    }
+
     render() { 
         return (  
             <div>
                 <h1> This page will contain customer information </h1>
+                <button className="btn btn-primary" onClick={this.getAllCustomers}>Get All Customers</button>
                 {this.renderCustomers()}
             </div>
         );
