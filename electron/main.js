@@ -31,19 +31,6 @@ ipcMain.handle('isAccessTokenValid', () => {
 })
 
 ipcMain.handle('qboSignIn', () => {
-  const winAuth = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: false
-    },
-    icon:'./electron/SABS Logo.png' 
-  })
-  winAuth.loadURL(qbo.createAuthUrl());
-});
-
-ipcMain.handle('NewSignIn', () => {
-
   https.get('https://sabstestfunc.azurewebsites.net/api/QBORequestAuth?', (res) => {
     const { statusCode } = res;
   
@@ -66,7 +53,6 @@ ipcMain.handle('NewSignIn', () => {
       winAuth.loadURL(rawData);
     });
   })
-  
 });
 
 ipcMain.handle('qboSignOut', () => {
