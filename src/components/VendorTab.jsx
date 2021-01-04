@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class Vendor extends Component {
     state = {  }
     renderNavBar = () => {
-        let navLink = "nav-link nav-extra ";
+        let navLink = "nav-link ";
         const {onTabContent, tabState} = this.props;
         var actionsClass = tabState[1] === ".actions" ? navLink + "active" : navLink + "";
         var vendorsClass = tabState[1] === ".vendors" ? navLink + "active" : navLink + "";
@@ -14,22 +14,22 @@ class Vendor extends Component {
 
         if (tabState[0] === ".a") {
             // Customer Tab Main Page Nav Bar
-            return  <div className="CustomerBar">
+            return  <div className="MyNavBar">
                         <ul className="nav nav-tabs">
                             <li className="nav-item">
                                 <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".a", ".actions", null])} >Actions</button>
                             </li>
                             <li className="nav-item" >
-                                <button className={vendorsClass} onClick={() => onTabContent("vendorTab", [".a", ".vendors", null])} >Customers</button>
+                                <button className={vendorsClass} onClick={() => onTabContent("vendorTab", [".a", ".vendors", null])} >Vendors</button>
                             </li>
                             <li className="nav-item" >
-                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".b", ".actions", "testCustomer"])} >Customer</button>
+                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".b", ".actions", "testCustomer"])} >Vendor</button>
                             </li>
                         </ul>
-                    </div>; 
+                    </div>
         } else if (tabState[0] === ".b") {
             // Customer Page Nav Bar
-            return  <div className="CustomerBar">
+            return  <div className="MyNavBar">
                         <ul className="nav nav-tabs">
                             <li className="nav-item">
                                 <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".b", ".actions", tabState[2]])} >Actions</button>

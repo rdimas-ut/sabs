@@ -1,4 +1,5 @@
 import "./styles.css"
+import "./mystyles.css"
 import React, { Component } from 'react';
 import Home from "./HomeTab"
 import Customer from "./CustomerTab"

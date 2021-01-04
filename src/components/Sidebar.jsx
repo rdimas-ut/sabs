@@ -12,7 +12,7 @@ class Sidebar extends Component {
 
         return (
             <div className="sidebar">
-                <img className="displayed" src={SABSLogo} alt="Some text"/>
+                <img src={SABSLogo} alt="Some text"/>
                 
                 <button className={homeButtonClass} onClick={() => onTab("home")} >Home</button>
                 <button className={customerButtonClass} onClick={() => onTab("customer")} >Customers</button>

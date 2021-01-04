@@ -40,11 +40,12 @@
 /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
 div.content {
     margin-left: 200px;
+    margin-right: 50px;
     padding: 1px 0px;
     height: 400px;
 }
 
-img.displayed {
+.sidebar img {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -52,48 +53,4 @@ img.displayed {
     padding-bottom: 15px;
     width: 50px;
     height: 120;
-}
-
-/* Custom CSS For the Customer and Vendor Tables */
-
-td, th {
-    padding: 0.5rem;
-    text-align: left;
-  }
-
-.CustomerTable {
-    padding:20px;
-}
-
-.FrameContent {
-    padding:20px;
-}
-
-.CustomerBar {
-    padding:20px 16px 0px;
-}
-
-.CustomerTable div {
-    border-bottom: 1px solid #555;
-    display: table;
-}
-
-.CustomerTable div,
-.CustomerTable div table,
-.CustomerTable div table thead,
-.CustomerTable div table tbody {
-    width: 100%;
-}
-
-.CustomerTable div table thead th,
-.CustomerTable div table tbody td {
-    width: 33%;
-}
-
-.CustomerTable div table tbody .mytd {
-    cursor: pointer;
-}
-
-.nav-extra:focus {
-    outline: none;
 }
