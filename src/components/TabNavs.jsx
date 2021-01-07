@@ -19,10 +19,10 @@ export const CustomersNav = (props) => {
         <div className="MyNavBar">
             <ul className="nav nav-tabs">
                 <li className="nav-item">
-                    <button className={actionsClass} onClick={() => onTabContent("customerTab", [".a", ".actions", null])} >Actions</button>
+                    <button className={actionsClass} onClick={() => onTabContent("customerTab", [".a", ".actions", ""])} >Actions</button>
                 </li>
                 <li className="nav-item" >
-                    <button className={customersClass} onClick={() => onTabContent("customerTab", [".a", ".customers", null])} >Customers</button>
+                    <button className={customersClass} onClick={() => onTabContent("customerTab", [".a", ".customers", ""])} >Customers</button>
                 </li>
             </ul>
         </div>
@@ -52,7 +52,7 @@ export const CustomerNav = (props) => {
                     <button className={censusClass} onClick={() => onTabContent("customerTab", [".b", ".census", tabState[2]])} >Census</button>
                 </li>
                 <li className="nav-item" >
-                    <button className={navLink} onClick={() => onTabContent("customerTab", [".a", ".customers", null])} >Back</button>
+                    <button className={navLink} onClick={() => onTabContent("customerTab", [".a", ".customers", ""])} >Back</button>
                 </li>
                 {NavBarButton(props)}
             </ul>

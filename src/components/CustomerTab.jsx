@@ -7,7 +7,8 @@ import PolicyModal from './PolicyModal'
 class Customer extends Component {
     state = {
         censusModal: false,
-        policiesModal: false
+        policiesModal: false,
+        php: "Hello, World"
     }
 
     setModalShow = (mstate, modalShow) => {
@@ -77,7 +78,10 @@ class Customer extends Component {
     }
 
     renderPolicies = () => {
-        return <div className="MyNavBar"> <h1>Policies state FFU</h1> </div>;
+        return <div className="MyNavBar"> 
+        <h1>Policies state FFU</h1> 
+        <button onClick={() => {console.log(this.state.php)}} >Print Out</button>
+        </div>;
     }
 
     renderCensus = () => {
@@ -130,8 +134,8 @@ class Customer extends Component {
             <div>
                 {this.renderNavBar()}
                 {this.renderTabContent()}
-                <CensusModal show={this.state.censusModal} onHide={() => this.setModalShow(".census", false)}/>
-                <PolicyModal show={this.state.policiesModal} onHide={() => this.setModalShow(".policies", false)}/>
+                <CensusModal tabState={this.props.tabState} show={this.state.censusModal} onHide={() => this.setModalShow(".census", false)}  />
+                <PolicyModal show={this.state.policiesModal} onHide={() => this.setModalShow(".policies", false)} />
             </div>
         );
     }

@@ -1,4 +1,4 @@
-/* Custom CSS For the Customer and Vendor Tables */
+/* Custom CSS NavBars */
 
 .MyNavBar {
     padding:20px 16px 0px;
@@ -13,6 +13,8 @@
 .MyNavBar ul li button {
     outline: none;
 }
+
+/* Tables */
 
 .MyTable {
     padding:20px;
@@ -65,4 +67,20 @@
 
 .Vendors div table tbody tr {
     cursor: pointer;
+}
+
+/*Custome Button*/
+
+.MyFormButton {
+    padding: 10px 10px 10px 10px;
+}
+
+.MyInlineButton {
+    padding-top: 36px;
+    padding-left: 20px;
+}
+
+.MyFormRow {
+    padding-left: 1px;
+    padding-right: 1px;
 }

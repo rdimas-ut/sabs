@@ -17,10 +17,10 @@ class Vendor extends Component {
             return  <div className="MyNavBar">
                         <ul className="nav nav-tabs">
                             <li className="nav-item">
-                                <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".a", ".actions", null])} >Actions</button>
+                                <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])} >Actions</button>
                             </li>
                             <li className="nav-item" >
-                                <button className={vendorsClass} onClick={() => onTabContent("vendorTab", [".a", ".vendors", null])} >Vendors</button>
+                                <button className={vendorsClass} onClick={() => onTabContent("vendorTab", [".a", ".vendors", ""])} >Vendors</button>
                             </li>
                             <li className="nav-item" >
                                 <button className={navLink} onClick={() => onTabContent("vendorTab", [".b", ".actions", "testCustomer"])} >Vendor</button>
@@ -41,7 +41,7 @@ class Vendor extends Component {
                                 <button className={censusClass} onClick={() => onTabContent("vendorTab", [".b", ".census", tabState[2]])} >Census</button>
                             </li>
                             <li className="nav-item" >
-                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".a", ".actions", null])} >Back</button>
+                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])} >Back</button>
                             </li>
                         </ul>
                     </div>; 

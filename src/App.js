@@ -12,8 +12,8 @@ class App extends Component {
     customers: null,
     vendors: null,
     // Tab state as define by two var
-    customerTab: [".a", ".customers", null],
-    vendorTab: [".a",".vendors", null]
+    customerTab: [".a", ".customers", ""],
+    vendorTab: [".a",".vendors", ""]
   };
 
   componentDidMount() {
@@ -82,7 +82,7 @@ class App extends Component {
     
     return (
       <React.Fragment>
-        <Sidebar tab={tab} onTab={this.handleTab} onDoubleTab={this.handleTabContent} />
+        <Sidebar tab={tab} onTab={this.handleTab} />
         <Content tab={tab} tabState={tabState} tabData={tabData} onTabContent={this.handleTabContent} />
       </React.Fragment>
     );

@@ -4,13 +4,7 @@ import CensusModal from './CensusModal';
 const { ipcRenderer } = window.require('electron');
 
 class Home extends Component {
-    state = {
-        modalShow: false
-    }
-
-    setModalShow = (modalShow) => {
-        this.setState({modalShow})
-    }
+    state = {}
 
     qboSignIn = () => {
         ipcRenderer.invoke('qboSignIn');
@@ -46,12 +40,6 @@ class Home extends Component {
                 <button onClick={this.refreshCustomer} className="btn btn-primary">Refresh Customer</button>
                 <button onClick={this.revokeTokens} className="btn btn-primary">Sign Out</button>
                 <button onClick={this.refreshVendor} className="btn btn-primary">Refresh Vendor</button>
-                <Button variant="primary" onClick={() => this.setModalShow(true)}>
-        Launch vertically centered modal
-      </Button>
-      <CensusModal
-      show={this.state.modalShow}
-        onHide={() => this.setModalShow(false)}/>
             </div>
          );
     }
