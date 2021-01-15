@@ -1,48 +1,43 @@
-import React, { Component } from 'react';
-import Button from 'react-bootstrap/Button';
-import CensusModal from './CensusModal';
-const { ipcRenderer } = window.require('electron');
+import React, { Component } from "react";
 
 class Home extends Component {
-    state = {}
+  state = {};
 
-    qboSignIn = () => {
-        ipcRenderer.invoke('qboSignIn');
-    }
-
-    qboSignOut = () => {
-
-    }
-
-    renderLogIn = () => {
-        // Will use laters
-        return <button onClick={this.qboSignIn} className="btn btn-primary"> Sign In </button>
-    }
-
-    refreshCustomer() {
-        console.log("refreshCustomer")
-        ipcRenderer.invoke('refreshCustomer');
-    }
-
-    refreshVendor() {
-        ipcRenderer.invoke('refreshVendor');
-    }
-
-    revokeTokens() {
-        ipcRenderer.invoke('revokeTokens')
-    }
-
-    render() { 
-        return ( 
-            <div className="FrameContent" >
-                <h1> This page will facilitate signing into quickbooks. </h1>
-                {this.renderLogIn()}
-                <button onClick={this.refreshCustomer} className="btn btn-primary">Refresh Customer</button>
-                <button onClick={this.revokeTokens} className="btn btn-primary">Sign Out</button>
-                <button onClick={this.refreshVendor} className="btn btn-primary">Refresh Vendor</button>
-            </div>
-         );
-    }
+  render() {
+    const {
+      qboSignIn,
+      qboSignOut,
+      refreshCustomer,
+      refreshVendor,
+    } = this.props;
+    return (
+      <div className="MyContent">
+        <h1> Quickbook Controls </h1>
+        <div className="btn-group">
+          <div className="MyFormButton">
+            <button onClick={qboSignIn} className="btn btn-primary">
+              Sign In
+            </button>
+          </div>
+          <div className="MyFormButton">
+            <button onClick={qboSignOut} className="btn btn-primary">
+              Sign Out
+            </button>
+          </div>
+          <div className="MyFormButton">
+            <button onClick={refreshCustomer} className="btn btn-primary">
+              Refresh Customer
+            </button>
+          </div>
+          <div className="MyFormButton">
+            <button onClick={refreshVendor} className="btn btn-primary">
+              Refresh Vendor
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
- 
+
 export default Home;

@@ -1,73 +1,145 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
+import { VendorsNav, VendorNav } from "./TabNavs";
 
 class Vendor extends Component {
-    state = {  }
-    renderNavBar = () => {
-        let navLink = "nav-link ";
-        const {onTabContent, tabState} = this.props;
-        var actionsClass = tabState[1] === ".actions" ? navLink + "active" : navLink + "";
-        var vendorsClass = tabState[1] === ".vendors" ? navLink + "active" : navLink + "";
+  state = {};
+  renderNavBar = () => {
+    const { onTabContent, tabState } = this.props;
 
-        var invoicesClass = tabState[1] === ".bills" ? navLink + "active" : navLink + "";
-        var censusClass = tabState[1] === ".census" ? navLink + "active" : navLink + "";
-
-
-        if (tabState[0] === ".a") {
-            // Customer Tab Main Page Nav Bar
-            return  <div className="MyNavBar">
-                        <ul className="nav nav-tabs">
-                            <li className="nav-item">
-                                <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])} >Actions</button>
-                            </li>
-                            <li className="nav-item" >
-                                <button className={vendorsClass} onClick={() => onTabContent("vendorTab", [".a", ".vendors", ""])} >Vendors</button>
-                            </li>
-                            <li className="nav-item" >
-                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".b", ".actions", "testCustomer"])} >Vendor</button>
-                            </li>
-                        </ul>
-                    </div>
-        } else if (tabState[0] === ".b") {
-            // Customer Page Nav Bar
-            return  <div className="MyNavBar">
-                        <ul className="nav nav-tabs">
-                            <li className="nav-item">
-                                <button className={actionsClass} onClick={() => onTabContent("vendorTab", [".b", ".actions", tabState[2]])} >Actions</button>
-                            </li>
-                            <li className="nav-item" >
-                                <button className={invoicesClass} onClick={() => onTabContent("vendorTab", [".b", ".bills", tabState[2]])} >Bills</button>
-                            </li>
-                            <li className="nav-item" >
-                                <button className={censusClass} onClick={() => onTabContent("vendorTab", [".b", ".census", tabState[2]])} >Census</button>
-                            </li>
-                            <li className="nav-item" >
-                                <button className={navLink} onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])} >Back</button>
-                            </li>
-                        </ul>
-                    </div>; 
-        } else if (tabState[0] === ".c") {
-            // Reserved
-        }
-
-        return(<div className="CustomerBar"> <h1>Nondefined state</h1> </div>);
+    if (tabState[0] === ".a") {
+      return <VendorsNav onTabContent={onTabContent} tabState={tabState} />;
+    } else if (tabState[0] === ".b") {
+      // Customer Page Nav Bar
+      return <VendorNav onTabContent={onTabContent} tabState={tabState} />;
+    } else if (tabState[0] === ".c") {
+      // Reserved
     }
 
+    return (
+      <div className="MyNavBar">
+        <h1>Undefined State</h1>
+      </div>
+    );
+  };
 
-    renderCellContent(c) {
-        if (c === null) {
-            return ""
-        } else {
-            return c
-        }
+  renderTabContent = () => {
+    const { tabState } = this.props;
+
+    if (tabState[0] === ".a") {
+      if (tabState[1] === ".vendors") {
+        return this.renderVendors();
+      } else if (tabState[1] === ".actions") {
+        return this.renderActions();
+      }
+    } else if (tabState[0] === ".b") {
+      if (tabState[1] === ".actions") {
+        return this.renderActions();
+      } else if (tabState[1] === ".bills") {
+        return this.renderBills();
+      } else if (tabState[1] === ".census") {
+        return this.renderCensus();
+      }
+    } else if (tabState[0] === ".c") {
+      // Reserved
     }
 
-    render() {
-        return (  
-            <div>
-                {this.renderNavBar()}
-            </div>
-        );
+    return (
+      <div className="MyContent">
+        <h1>Nondefined state</h1>
+      </div>
+    );
+  };
+
+  renderActions = () => {
+    return (
+      <div className="MyContent">
+        <h1>Actions table FFU</h1>{" "}
+      </div>
+    );
+  };
+
+  renderBills = () => {
+    return (
+      <div className="MyContent">
+        {" "}
+        <h1>Bills state FFU</h1>{" "}
+      </div>
+    );
+  };
+
+  renderCensus = () => {
+    return (
+      <div className="MyContent">
+        <h1>Census table FFU</h1>{" "}
+      </div>
+    );
+  };
+
+  renderVendors = () => {
+    // Customer raises errors
+    const { vendors, onTabContent } = this.props;
+    if (!vendors) {
+      return <h1>No customers found/Loading</h1>;
+    } else {
+      return (
+        <div className="MyTable Customers">
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Display Name</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          {vendors.map((vendor) => {
+            return (
+              <div key={vendor.DispName}>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td
+                        onClick={() =>
+                          onTabContent("vendorTab", [
+                            ".b",
+                            ".actions",
+                            vendor.DispName,
+                          ])
+                        }
+                      >
+                        {this.renderCellContent(vendor.DispName)}
+                      </td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
+      );
     }
+  };
+
+  renderCellContent(c) {
+    if (c === null) {
+      return "";
+    } else {
+      return c;
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderNavBar()}
+        {this.renderTabContent()}
+      </div>
+    );
+  }
 }
- 
+
 export default Vendor;

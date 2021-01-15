@@ -1,86 +1,89 @@
 /* Custom CSS NavBars */
 
 .MyNavBar {
-    padding:20px 16px 0px;
+  padding: 20px 20px 0px;
 }
 
 .MyNavBar ul li .MyNavBarButton {
-    padding-right: 50px;
-    padding-left: 50px;
-    text-align: center;
+  padding-right: 50px;
+  padding-left: 50px;
+  text-align: center;
 }
 
 .MyNavBar ul li button {
-    outline: none;
+  outline: none;
 }
 
 /* Tables */
 
 .MyTable {
-    padding:20px;
+  padding: 20px;
 }
 
 .MyTable div {
-    border-bottom: 1px solid #555;
-    display: table;
+  border-bottom: 1px solid #555;
+  display: table;
 }
 
 .MyTable div,
 .MyTable div table,
 .MyTable div table thead,
 .MyTable div table tbody {
-    width: 100%;
+  width: 100%;
 }
 
+/* Content */
+.MyContent {
+  padding: 20px;
+}
 
 /*The Stuff Below can be used to customized the table itself*/
 
-.MyTable div table thead th,
+/* .MyTable div table thead th,
 .MyTable div table tbody td {
-    width: 33%;
-    padding: 0.5rem;
-    text-align: left;
+  width: 33%;
+  padding: 0.5rem;
+  text-align: left;
 }
 
 .MyTable div table tbody tr {
-    cursor: pointer;
-}
+  cursor: pointer;
+} */
 
 .Customers div table thead th,
 .Customers div table tbody td {
-    width: 33%;
-    padding: 0.5rem;
-    text-align: left;
+  width: 33%;
+  padding: 0.5rem;
+  text-align: left;
 }
 
 .Customers div table tbody tr {
-    cursor: pointer;
+  cursor: pointer;
 }
-
 
 .Vendors div table thead th,
 .Vendors div table tbody td {
-    width: 33%;
-    padding: 0.5rem;
-    text-align: left;
+  width: 33%;
+  padding: 0.5rem;
+  text-align: left;
 }
 
 .Vendors div table tbody tr {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /*Custome Button*/
 
 .MyFormButton {
-    padding: 10px 10px 10px 10px;
+  padding: 10px 10px 10px 10px;
 }
 
 .MyInlineButton {
-    padding-top: 36px;
-    padding-left: 20px;
+  padding-top: 36px;
+  padding-left: 20px;
 }
 
 .MyFormRow {
-    padding-left: 1px;
-    padding-right: 1px;
+  padding-left: 1px;
+  padding-right: 1px;
 }

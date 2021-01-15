@@ -1,60 +1,130 @@
 import React, { Component } from "react";
-import Sidebar from "./components/Sidebar"
-import Content from "./components/Content"
+import Sidebar from "./components/Sidebar";
+import Content from "./components/Content";
 import "bootstrap/dist/css/bootstrap.css";
-const { ipcRenderer } = window.require('electron');
+const { ipcRenderer } = window.require("electron");
 
 class App extends Component {
   state = {
     tab: "home",
     qbo: false,
+    appstate: null,
     // Tab data needed
-    customers: null,
-    vendors: null,
+    customers: [],
+    vendors: [],
+    policies: [],
+    census: [],
     // Tab state as define by two var
     customerTab: [".a", ".customers", ""],
-    vendorTab: [".a",".vendors", ""]
+    vendorTab: [".a", ".vendors", ""],
   };
 
   componentDidMount() {
-    // Call the initial refreshToken
-    // this.refreshAccessToken();
-    // this.timerRefreshAccessToken = setInterval(
-    //   () => this.refreshAccessToken(),
-    //   3539500);
-    // this.timerAcessToken = setInterval(
-    //   () => this.isAccessTokenValid(), 
-    //   1000);
-    
     // Load the customer information
-    this.refreshCustomerDB();
+    this.getState();
+    this.getCustomers();
+    this.getVendors();
+    this.getPolicies();
+    this.getCensus();
+    this.timerQBO = setInterval(() => this.isUserSignedInToQBO(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerQBO);
+  }
+
+  handleCensusSubmit = async (Customer, Status, Params) => {
+    const { census } = this.state;
+    var commd =
+      'select EC, EE, EF, ES from Census where Status = "Actual" and CovDate = ';
+    const DTS = Math.floor(Date.now() / 1000);
+    console.log(Params.CovDate);
+
+    if (Params.CovDate) {
+      commd += String(Params.CovDate);
+      const CensusByDate = await ipcRenderer.invoke("execute", commd);
+      console.log(CensusByDate);
+    }
+
+    console.log(Params);
   };
 
-  refreshCustomerDB = () => {
-    ipcRenderer.invoke('testSQLITE').then((result)=> {
-      var i;
-      for (i = 0; i < result.length; i++) {
-          console.log(result[i].DispName);
-      }
-      this.setState({tabData: this.state.tabData, customers: result})
-    });
+  qboSignIn = () => {
+    ipcRenderer.invoke("qboSignIn");
   };
 
-  // componentWillUnmount() {
-  //   clearInterval(this.timerAcessToken);
-  //   clearInterval(this.timerRefreshAccessToken);
-  // };
+  qboSignOut = async () => {
+    await ipcRenderer.invoke("qboSignOut");
+    this.getState();
+  };
 
-  // refreshAccessToken() {
-  //   ipcRenderer.invoke('refreshAccessToken');
-  // };
+  refreshCustomer = async () => {
+    await ipcRenderer.invoke("refreshCustomer");
+    this.getCustomers();
+  };
 
-  // isAccessTokenValid () {
-  //   ipcRenderer.invoke('isAccessTokenValid').then((result) => {
-  //     let isAccessTokenValid = result;
-  //     this.setState({isAccessTokenValid})
-  //   })
-  // };
+  refreshVendor = async () => {
+    await ipcRenderer.invoke("refreshVendor");
+    this.getVendors();
+  };
+
+  getState = async () => {
+    try {
+      const result = await ipcRenderer.invoke("getState");
+      this.setState({ appstate: result });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  getCustomers = async () => {
+    try {
+      const result = await ipcRenderer.invoke("getCustomers");
+      this.setState({ customers: result });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  getVendors = async () => {
+    try {
+      const result = await ipcRenderer.invoke("getVendors");
+      this.setState({ vendors: result });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getPolicies = async () => {
+    try {
+      const result = await ipcRenderer.invoke("getPolicies");
+      this.setState({ policies: result });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getCensus = async () => {
+    try {
+      const result = await ipcRenderer.invoke("getCensus");
+      this.setState({ census: result });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  isUserSignedInToQBO = () => {
+    const { appstate } = this.state;
+    try {
+      const rf_expire_date =
+        appstate.date_created + appstate.x_refresh_token_expires_in;
+      const qbo = rf_expire_date > Math.floor(Date.now() / 1000);
+      console.log(qbo);
+      this.setState({ qbo });
+    } catch (err) {
+      console.log("App State has not been retrieved!");
+    }
+  };
 
   handleTab = (tab) => {
     this.setState({ tab });
@@ -62,28 +132,47 @@ class App extends Component {
 
   handleTabContent = (tab, tabState) => {
     if (tab === "customerTab") {
-      this.setState({customerTab:tabState})
+      this.setState({ customerTab: tabState });
     } else if (tab === "vendorTab") {
-      this.setState({vendorTab:tabState})
+      this.setState({ vendorTab: tabState });
     }
   };
 
   render() {
-    const {tab, customers, vendors, customerTab, vendorTab} = this.state;
+    const { tab } = this.state;
     const tabData = {
-      customers: customers,
-      vendors: vendors
-    }
+      customers: this.state.customers,
+      vendors: this.state.vendors,
+      policies: this.state.policies,
+      censusu: this.state.census,
+    };
     const tabState = {
-      customerTab: customerTab,
-      vendorTab: vendorTab
+      customerTab: this.state.customerTab,
+      vendorTab: this.state.vendorTab,
     };
 
-    
+    const testButtons = {
+      qboSignOut: this.qboSignOut,
+      qboSignIn: this.qboSignIn,
+      refreshVendor: this.refreshVendor,
+      refreshCustomer: this.refreshCustomer,
+    };
+
+    const censusFunctions = {
+      onCensusSubmit: this.handleCensusSubmit,
+    };
+
     return (
       <React.Fragment>
         <Sidebar tab={tab} onTab={this.handleTab} />
-        <Content tab={tab} tabState={tabState} tabData={tabData} onTabContent={this.handleTabContent} />
+        <Content
+          censusFunctions={censusFunctions}
+          testButtons={testButtons}
+          tab={tab}
+          tabState={tabState}
+          tabData={tabData}
+          onTabContent={this.handleTabContent}
+        />
       </React.Fragment>
     );
   }
