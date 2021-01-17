@@ -24,6 +24,17 @@ function CustomerNavBarButton(props) {
         </button>
       </li>
     );
+  } else if (tabState[1] === ".invoices") {
+    return (
+      <li className="nav-item ml-auto">
+        <button
+          className="btn btn-primary MyNavBarButton"
+          onClick={() => onModalShow("censusModal", true)}
+        >
+          New
+        </button>
+      </li>
+    );
   }
   return;
 }

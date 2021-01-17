@@ -813,8 +813,7 @@ function insert(tableName, dataDict) {
         res.on("end", () => {
           try {
             console.log(rawData);
-            parsedData = JSON.parse(rawData);
-            resolve(parsedData);
+            resolve(rawData);
           } catch (err) {
             console.error(err.message);
           }

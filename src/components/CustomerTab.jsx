@@ -1,18 +1,28 @@
 import React, { Component } from "react";
 import { CustomersNav, CustomerNav } from "./TabNavs";
 import PolicyModal from "./PolicyModal";
-import CensusModal from "./CensusModal";
+import { CensusModal } from "./CensusModal";
+import { myDate } from "./DateHelpers";
 // const { ipcRenderer } = window.require('electron');
 
 class Customer extends Component {
   state = {
     censusModal: false,
-    censusModalMode: "new",
+    newCensus: true,
+    selectedCensus: [],
     policiesModal: false,
   };
 
   handleModalShow = (modal, mstate) => {
     this.setState({ [modal]: mstate });
+  };
+
+  showCensusModal = (newCensus = true) => {
+    this.setState({ censusModal: true, newCensus });
+  };
+
+  hideCensusModal = (newCensus = true) => {
+    this.setState({ censusModal: false, newCensus });
   };
 
   renderNavBar = () => {
@@ -90,17 +100,95 @@ class Customer extends Component {
   };
 
   renderPolicies = () => {
+    const { policies, tabState } = this.props;
     return (
-      <div className="MyContent">
-        <h1>Policies state FFU</h1>
+      <div className="MyTable Policies">
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th className="InitCell">Start Date</th>
+                <th className="SecondCell">MIC</th>
+                <th className="SecondCell">MGU</th>
+                <th className="SecondCell">Carrier</th>
+                <th className="SecondCell">Network</th>
+                <th className="SecondCell">Admin/TPA</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {policies
+          .filter((pol) => pol.Customer === tabState[2])
+          .map((pol) => {
+            return (
+              <div key={pol.PID}>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td className="InitCell">
+                        {this.renderCellContent(myDate(pol.StartDate))}
+                      </td>
+                      <td className="SecondCell">{String(pol.MIC)}</td>
+                      <td className="SecondCell">{String(pol.MGU)}</td>
+                      <td className="SecondCell">{String(pol.Carrier)}</td>
+                      <td className="SecondCell">{String(pol.Network)}</td>
+                      <td className="SecondCell">{String(pol.AdminTPA)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
       </div>
     );
   };
 
   renderCensus = () => {
+    const { census, tabState } = this.props;
     return (
-      <div className="MyContent">
-        <h1>Census table FFU</h1>{" "}
+      <div className="MyTable Census">
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th className="CovDate">Coverage Date</th>
+                <th className="Tier">EE</th>
+                <th className="Tier">ES</th>
+                <th className="Tier">EC </th>
+                <th className="Tier">EF</th>
+                <th className="Tier"></th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {census
+          .filter((cen) => cen.Customer === tabState[2])
+          .map((cen) => {
+            return (
+              <div key={cen.CovDate}>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td
+                        className="CovDate"
+                        onClick={() => {
+                          this.showCensusModal(false);
+                          this.setState({ selectedCensus: cen });
+                        }}
+                      >
+                        {this.renderCellContent(myDate(cen.CovDate))}
+                      </td>
+                      <td className="Tier">{String(cen.EE)}</td>
+                      <td className="Tier">{String(cen.ES)}</td>
+                      <td className="Tier">{String(cen.EC)}</td>
+                      <td className="Tier">{String(cen.EF)}</td>
+                      <td className="Tier"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
       </div>
     );
   };
@@ -168,12 +256,17 @@ class Customer extends Component {
         {this.renderNavBar()}
         {this.renderTabContent()}
         <CensusModal
-          tabState={this.props.tabState}
+          selectedCensus={this.state.selectedCensus}
+          newCensus={this.state.newCensus}
           onCensusSubmit={this.props.onCensusSubmit}
+          onCensusInsert={this.props.onCensusInsert}
+          tabState={this.props.tabState}
           show={this.state.censusModal}
-          onHide={() => this.handleModalShow("censusModal", false)}
+          onHide={this.hideCensusModal}
         />
         <PolicyModal
+          tabState={this.props.tabState}
+          onPolicySubmit={this.props.onPolicySubmit}
           show={this.state.policiesModal}
           onHide={() => this.handleModalShow("policiesModal", false)}
         />

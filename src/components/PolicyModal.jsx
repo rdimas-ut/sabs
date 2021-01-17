@@ -585,7 +585,7 @@ class PolicyModal extends Component {
   };
 
   render() {
-    const { show, onHide } = this.props;
+    const { show, onHide, tabState } = this.props;
 
     return (
       <Modal
@@ -757,7 +757,7 @@ class PolicyModal extends Component {
               <div className="MyFormButton">
                 <Button
                   onClick={() => {
-                    console.log("Will Submit Form");
+                    this.props.onPolicySubmit(tabState[2], this.state);
                   }}
                   variant="primary"
                 >

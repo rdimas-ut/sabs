@@ -61,6 +61,8 @@
   cursor: pointer;
 }
 
+/* Vendors Table */
+
 .Vendors div table thead th,
 .Vendors div table tbody td {
   width: 33%;
@@ -70,6 +72,40 @@
 
 .Vendors div table tbody tr {
   cursor: pointer;
+}
+
+/* Census */
+.Census div table thead .CovDate,
+.Census div table tbody .CovDate {
+  width: 30%;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.Census div table thead .Tier,
+.Census div table tbody .Tier {
+  width: 14%;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.Census div table tbody tr {
+  cursor: pointer;
+}
+
+/* Policies */
+.Policies div table thead .InitCell,
+.Policies div table tbody .InitCell {
+  width: 30%;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.Policies div table thead .SecondCell,
+.Policies div table tbody .SecondCell {
+  width: 14%;
+  padding: 0.5rem;
+  text-align: left;
 }
 
 /*Custome Button*/

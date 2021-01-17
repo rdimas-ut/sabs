@@ -21,7 +21,9 @@ class Content extends Component {
       <Home {...testButtons} />,
       <Customer
         {...censusFunctions}
+        policies={tabData.policies}
         customers={tabData.customers}
+        census={tabData.census}
         onTabContent={onTabContent}
         tabState={tabState.customerTab}
       />,
