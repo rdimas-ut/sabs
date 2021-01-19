@@ -1,13 +1,18 @@
 import "./mystyles.css";
 
 function CustomerNavBarButton(props) {
-  const { onModalShow, tabState } = props;
+  const {
+    tabState,
+    showCensusModal,
+    showPolicyModal,
+    showInvoiceModal,
+  } = props;
   if (tabState[1] === ".policies") {
     return (
       <li className="nav-item ml-auto">
         <button
           className="btn btn-primary MyNavBarButton"
-          onClick={() => onModalShow("policiesModal", true)}
+          onClick={showPolicyModal}
         >
           New
         </button>
@@ -18,7 +23,7 @@ function CustomerNavBarButton(props) {
       <li className="nav-item ml-auto">
         <button
           className="btn btn-primary MyNavBarButton"
-          onClick={() => onModalShow("censusModal", true)}
+          onClick={showCensusModal}
         >
           New
         </button>
@@ -29,7 +34,7 @@ function CustomerNavBarButton(props) {
       <li className="nav-item ml-auto">
         <button
           className="btn btn-primary MyNavBarButton"
-          onClick={() => onModalShow("censusModal", true)}
+          onClick={showInvoiceModal}
         >
           New
         </button>

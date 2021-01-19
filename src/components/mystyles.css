@@ -108,6 +108,10 @@
   text-align: left;
 }
 
+.Policies div table tbody tr {
+  cursor: pointer;
+}
+
 /*Custome Button*/
 
 .MyFormButton {

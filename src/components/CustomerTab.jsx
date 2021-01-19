@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { CustomersNav, CustomerNav } from "./TabNavs";
-import PolicyModal from "./PolicyModal";
+import { PolicyModal } from "./PolicyModal";
 import { CensusModal } from "./CensusModal";
+import { InvoiceModal } from "./InvoiceModal";
 import { myDate } from "./DateHelpers";
 // const { ipcRenderer } = window.require('electron');
 
@@ -10,11 +11,12 @@ class Customer extends Component {
     censusModal: false,
     newCensus: true,
     selectedCensus: [],
-    policiesModal: false,
-  };
 
-  handleModalShow = (modal, mstate) => {
-    this.setState({ [modal]: mstate });
+    policiesModal: false,
+    selectedPolicy: "",
+
+    invoiceModal: false,
+    selectedInvoice: "",
   };
 
   showCensusModal = (newCensus = true) => {
@@ -25,13 +27,31 @@ class Customer extends Component {
     this.setState({ censusModal: false, newCensus });
   };
 
+  showPolicyModal = () => {
+    this.setState({ policiesModal: true });
+  };
+
+  hidePolicyModal = () => {
+    this.setState({ policiesModal: false, selectedPolicy: "" });
+  };
+
+  showInvoiceModal = () => {
+    this.setState({ invoiceModal: true });
+  };
+
+  hideInvoiceModal = () => {
+    this.setState({ invoiceModal: false, selectedInvoice: "" });
+  };
+
   renderNavBar = () => {
     const { onTabContent, tabState } = this.props;
 
     const NavBarProps = {
       onTabContent,
       tabState,
-      onModalShow: this.handleModalShow,
+      showCensusModal: this.showCensusModal,
+      showPolicyModal: this.showPolicyModal,
+      showInvoiceModal: this.showInvoiceModal,
     };
 
     if (tabState[0] === ".a") {
@@ -124,7 +144,12 @@ class Customer extends Component {
               <div key={pol.PID}>
                 <table>
                   <tbody>
-                    <tr>
+                    <tr
+                      onClick={() => {
+                        this.setState({ selectedPolicy: pol });
+                        this.showPolicyModal(true);
+                      }}
+                    >
                       <td className="InitCell">
                         {this.renderCellContent(myDate(pol.StartDate))}
                       </td>
@@ -168,14 +193,13 @@ class Customer extends Component {
               <div key={cen.CovDate}>
                 <table>
                   <tbody>
-                    <tr>
-                      <td
-                        className="CovDate"
-                        onClick={() => {
-                          this.showCensusModal(false);
-                          this.setState({ selectedCensus: cen });
-                        }}
-                      >
+                    <tr
+                      onClick={() => {
+                        this.showCensusModal(false);
+                        this.setState({ selectedCensus: cen });
+                      }}
+                    >
+                      <td className="CovDate">
                         {this.renderCellContent(myDate(cen.CovDate))}
                       </td>
                       <td className="Tier">{String(cen.EE)}</td>
@@ -258,17 +282,26 @@ class Customer extends Component {
         <CensusModal
           selectedCensus={this.state.selectedCensus}
           newCensus={this.state.newCensus}
-          onCensusSubmit={this.props.onCensusSubmit}
           onCensusInsert={this.props.onCensusInsert}
           tabState={this.props.tabState}
           show={this.state.censusModal}
           onHide={this.hideCensusModal}
         />
         <PolicyModal
+          selectedPolicy={this.state.selectedPolicy}
+          vendors={this.props.vendors}
+          censuspremium={this.props.censuspremium}
+          billfees={this.props.billfees}
+          feespremium={this.props.feespremium}
+          onPolicyInsert={this.props.onPolicyInsert}
+          onPolicyDelete={this.props.onPolicyDelete}
           tabState={this.props.tabState}
-          onPolicySubmit={this.props.onPolicySubmit}
           show={this.state.policiesModal}
-          onHide={() => this.handleModalShow("policiesModal", false)}
+          onHide={this.hidePolicyModal}
+        />
+        <InvoiceModal
+          show={this.state.invoiceModal}
+          onHide={this.hideInvoiceModal}
         />
       </div>
     );

@@ -854,7 +854,6 @@ function delete_db(tableName, searchDict) {
         res.on("end", () => {
           try {
             console.log(rawData);
-            parsedData = JSON.parse(rawData);
             resolve(parsedData);
           } catch (err) {
             console.error(err.message);

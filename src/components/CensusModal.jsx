@@ -59,7 +59,7 @@ export function CensusModal(props) {
         User: user,
       };
       props.onCensusInsert(params, newC);
-      props.onHide();
+      handleHide();
     }
 
     setValidated(true);

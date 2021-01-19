@@ -21,6 +21,9 @@ class App extends Component {
     vendors: [],
     policies: [],
     census: [],
+    censuspremium: [],
+    feespremium: [],
+    billfees: [],
     // Tab state as define by two var
     customerTab: [".a", ".customers", ""],
     vendorTab: [".a", ".vendors", ""],
@@ -37,6 +40,9 @@ class App extends Component {
     this.getVendors();
     this.getPolicies();
     this.getCensus();
+    this.getCensusPremium();
+    this.getFeesPremium();
+    this.getBillFees();
     this.timerQBO = setInterval(() => this.isUserSignedInToQBO(), 1000);
   }
 
@@ -56,83 +62,47 @@ class App extends Component {
     this.setState({ errorModal: false });
   };
 
-  handlePolicySubmit = async (Customer, Params) => {
-    console.log(Customer);
-    console.log(Params);
-    const PID = Date.now();
+  handlePolicyInsert = async (
+    PolicyParams,
+    CensusPremiumParams,
+    FeesPremiumParams,
+    BillFeesParams
+  ) => {
+    try {
+      const selectPolicy =
+        "select * from Policy where PID = " + String(PolicyParams.PID);
 
-    const InsertPolicy = {
-      PID: PID,
-      Customer: Customer,
-      MGU: Params.formMGU,
-      Carrier: Params.formCarrier,
-      Network: Params.formNetwork,
-      AdminTPA: Params.formAdminTPA,
-      MIC: Params.formMIC,
-      StartDate: Params.formStartDate,
-      Source: Params.newsource,
-    };
-
-    await ipcRenderer.invoke("insert", "Policy", InsertPolicy);
-
-    const InsertSpecRate = {
-      PID: PID,
-      TierStruc: Params.SpecStruc,
-      Type: "Aggregate",
-      EE: Params.formSpecEE,
-      ES: Params.formSpecES,
-      EC: Params.formSpecEC,
-      EF: Params.formSpecEF,
-    };
-
-    await ipcRenderer.invoke("insert", "CensusPremium", InsertSpecRate);
-
-    const InsertAggRate = {
-      PID: PID,
-      TierStruc: Params.AggStruc,
-      EE: Params.formAggEE,
-      ES: Params.formAggES,
-      EC: Params.formAggEC,
-      EF: Params.formAggEF,
-    };
-
-    await ipcRenderer.invoke("insert", "CensusPremium", InsertAggRate);
-
-    var i;
-    for (i = 0; i < Params.PremiumFees.length; i++) {
-      if (
-        Params.PremiumFees[i].formPremFeeCalMethod &&
-        Params.PremiumFees[i].formPremFeeRate &&
-        Params.PremiumFees[i].formPremFeeVendor
-      ) {
-        var InsertFeesPremium = {
-          PID: PID,
-          Vendor: Params.PremiumFees[i].formPremFeeVendor,
-          Calc: Params.PremiumFees[i].formPremFeeCalMethod,
-          Rate: Params.PremiumFees[i].formPremFeeRate,
-        };
-
-        await ipcRenderer.invoke("insert", "FeesPremium", InsertFeesPremium);
+      const cpol = await ipcRenderer.invoke("execute", selectPolicy);
+      if (cpol.res.length > 0) {
+        await ipcRenderer.invoke("delete", "Policy", { PID: PolicyParams.PID });
+        await ipcRenderer.invoke("delete", "CensusPremium", {
+          PID: PolicyParams.PID,
+        });
+        await ipcRenderer.invoke("delete", "FeesPremium", {
+          PID: PolicyParams.PID,
+        });
+        await ipcRenderer.invoke("delete", "BillFees", {
+          PID: PolicyParams.PID,
+        });
       }
-    }
-    for (i = 0; i < Params.VendorFees.length; i++) {
-      if (
-        Params.VendorFees[i].formVendorFeeCalMethod &&
-        Params.VendorFees[i].formVendorFeeRate &&
-        Params.VendorFees[i].formVendorFeeVendor
-      ) {
-        var InsertBillFees = {
-          PID: PID,
-          Vendor: Params.VendorFees[i].formVendorFeeVendor,
-          Calc: Params.VendorFees[i].formVendorFeeCalMethod,
-          Rate: Params.VendorFees[i].formVendorFeeRate,
-        };
+      await ipcRenderer.invoke("insert", "Policy", PolicyParams);
 
-        await ipcRenderer.invoke("insert", "BillFees", InsertBillFees);
+      for (const element of CensusPremiumParams) {
+        await ipcRenderer.invoke("insert", "CensusPremium", element);
       }
+      for (const element of FeesPremiumParams) {
+        await ipcRenderer.invoke("insert", "FeesPremium", element);
+      }
+      for (const element of BillFeesParams) {
+        await ipcRenderer.invoke("insert", "BillFees", element);
+      }
+      await this.getPolicies();
+      await this.getCensusPremium();
+      await this.getBillFees();
+      await this.getFeesPremium();
+    } catch (error) {
+      console.log(error);
     }
-
-    console.log("Finished handle");
   };
 
   handleCensusInsert = async (Params, New) => {
@@ -151,7 +121,7 @@ class App extends Component {
       Params.EF = Number(Params.EF) - Number(res[0].EF);
     }
 
-    if (res.length == 1 && New) {
+    if (res.length === 1 && New) {
       this.showErrorModal(
         "Census Error",
         "An entry for this month already exist."
@@ -159,6 +129,28 @@ class App extends Component {
     } else {
       await ipcRenderer.invoke("insert", "CensusLog", Params);
       await this.getCensus();
+    }
+  };
+
+  handlePolicyDelete = async (PID) => {
+    try {
+      await ipcRenderer.invoke("delete", "Policy", { PID: PID });
+      await ipcRenderer.invoke("delete", "CensusPremium", {
+        PID: PID,
+      });
+      await ipcRenderer.invoke("delete", "FeesPremium", {
+        PID: PID,
+      });
+      await ipcRenderer.invoke("delete", "BillFees", {
+        PID: PID,
+      });
+
+      await this.getPolicies();
+      await this.getCensusPremium();
+      await this.getBillFees();
+      await this.getFeesPremium();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -226,6 +218,36 @@ class App extends Component {
     }
   };
 
+  getCensusPremium = async () => {
+    const commd = "select * from CensusPremium";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ censuspremium: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getFeesPremium = async () => {
+    const commd = "select * from FeesPremium";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ feespremium: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getBillFees = async () => {
+    const commd = "select * from BillFees";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ billfees: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   isUserSignedInToQBO = () => {
     const { appstate } = this.state;
     try {
@@ -257,16 +279,25 @@ class App extends Component {
       vendors,
       policies,
       census,
+      censuspremium,
+      billfees,
+      feespremium,
       customerTab,
       vendorTab,
     } = this.state;
     const cProps = {
       policies,
+      vendors,
       customers,
       census,
-      onTabContent: this.handleTabContent,
+      censuspremium,
+      billfees,
+      feespremium,
       tabState: customerTab,
+      onTabContent: this.handleTabContent,
       onCensusInsert: this.handleCensusInsert,
+      onPolicyInsert: this.handlePolicyInsert,
+      onPolicyDelete: this.handlePolicyDelete,
     };
 
     const vProps = {
@@ -282,14 +313,10 @@ class App extends Component {
       refreshCustomer: this.refreshCustomer,
     };
 
-    const censusFunctions = {
-      onPolicySubmit: this.handlePolicySubmit,
-    };
-
     const { tab } = this.state;
     const com = [
       <Home {...testButtons} />,
-      <Customer {...censusFunctions} {...cProps} />,
+      <Customer {...cProps} />,
       <Vendor {...vProps} />,
     ];
 
@@ -300,7 +327,6 @@ class App extends Component {
 
   render() {
     const { tab } = this.state;
-
     return (
       <React.Fragment>
         <Sidebar tab={tab} onTab={this.handleTab} />
