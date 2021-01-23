@@ -50,10 +50,30 @@ export const InvoiceModal = (props) => {
 
       <Modal.Body>
         <Form noValidate>
+          <Form.Group controlId="policy">
+            <Form.Label>Policy</Form.Label>
+            <Form.Control
+              name="policy"
+              type="text"
+              placeholder="Carrier-DD-MMM-YYY"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="billingtype">
+            <Form.Label>Billing Type</Form.Label>
+            <Form.Control
+              name="billingtype"
+              type="text"
+              placeholder="Census/Self-Bill/Self-Adjust"
+            />
+          </Form.Group>
+
           <Form.Group controlId="covdate">
             <Form.Label>Invoice Month</Form.Label>
             <Form.Control name="covdate" type="month" />
           </Form.Group>
+
+          <h4>Census</h4>
 
           <Form.Row className="MyFormRow">
             <Form.Group as={Col} md="2" controlId="ee">
@@ -105,6 +125,44 @@ export const InvoiceModal = (props) => {
               <Form.Control disabled type="number" value={compositeValue} />
             </Form.Group>
           </Form.Row>
+
+          <h4>Lines</h4>
+
+          <div className="MyTable InvoiceModalLines">
+            <div>
+              <table>
+                <thead>
+                  <th>Description</th>
+                  <th>Product/Service</th>
+                  <th>Rate</th>
+                  <th>Lives</th>
+                  <th>Amount</th>
+                </thead>
+              </table>
+            </div>
+            <div>
+              <table>
+                <tbody>
+                  <tr>
+                    <td>Aug 2020 - EE</td>
+                    <td>
+                      <select name="cars" id="cars">
+                        <option value="volvo">Volvo</option>
+                        <option value="saab">Saab</option>
+                        <option value="opel">Opel</option>
+                        <option value="audi">Audi</option>
+                      </select>
+                    </td>
+                    <td>23.54</td>
+                    <td>100</td>
+                    <td>2345.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <h4></h4>
 
           <Button type="button">Submit</Button>
         </Form>

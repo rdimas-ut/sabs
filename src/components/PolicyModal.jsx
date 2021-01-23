@@ -25,6 +25,7 @@ export const PolicyModal = (props) => {
   const [admintpa, setAdminTPA] = useState("");
   const [mic, setMIC] = useState("");
   const [startdate, setStartDate] = useState("");
+  const [billingtype, setBillingType] = useState("");
 
   const [specee, setSpecEE] = useState("");
   const [speces, setSpecES] = useState("");
@@ -83,6 +84,7 @@ export const PolicyModal = (props) => {
 
     specstruc: setSpecStruc,
     aggstruc: setAggStruc,
+    billingtype: setBillingType,
   };
 
   const staticChanges = (event) => {
@@ -190,11 +192,6 @@ export const PolicyModal = (props) => {
     setBillFees(nbillfees);
   };
 
-  // PolicyParams,
-  // CensusPremiumParams,
-  // FeesPremiumParams,
-  // BillFeesParams
-
   const handleSubmit = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -214,6 +211,7 @@ export const PolicyModal = (props) => {
         MIC: Number(mic),
         StartDate: myTime(startdate),
         Source: excel,
+        BillingType: billingtype,
       };
       const CensusPremiumParams = [
         {
@@ -329,6 +327,7 @@ export const PolicyModal = (props) => {
       setAdminTPA(props.selectedPolicy.AdminTPA);
       setMIC(props.selectedPolicy.MIC);
       setStartDate(myDate(props.selectedPolicy.StartDate, true));
+      setBillingType(props.selectedPolicy.BillingType);
 
       const selectedCensusPremium = props.censuspremium.filter(
         (cp) => cp.PID === props.selectedPolicy.PID
@@ -369,6 +368,14 @@ export const PolicyModal = (props) => {
           rate: element.Rate,
         });
       }
+      nfp.push({
+        fpid: "",
+        id: String(Date.now()),
+        type: "",
+        vendor: "",
+        calc: "",
+        rate: "",
+      });
       setPremFees(nfp);
       var nbf = [];
       for (const element of selectedBillFees) {
@@ -380,6 +387,13 @@ export const PolicyModal = (props) => {
           rate: element.Rate,
         });
       }
+      nbf.push({
+        bfid: "",
+        id: String(Date.now()),
+        vendor: "",
+        calc: "",
+        rate: "",
+      });
       setBillFees(nbf);
       setExcel(props.selectedPolicy.Source);
     }
@@ -421,6 +435,7 @@ export const PolicyModal = (props) => {
               value={carrier}
               onChange={staticChanges}
               type="text"
+              required
             />
           </Form.Group>
 
@@ -451,7 +466,26 @@ export const PolicyModal = (props) => {
               value={mic}
               onChange={staticChanges}
               type="number"
+              required
             />
+          </Form.Group>
+
+          <Form.Group controlId="billingtype">
+            <Form.Label>Billing Type</Form.Label>
+            <Form.Control
+              required
+              disabled={!edit}
+              value={billingtype}
+              onChange={staticChanges}
+              as="select"
+              className="mr-sm-2"
+              custom
+            >
+              <option value="">Choose...</option>
+              <option value="Census">Census</option>
+              <option value="Self-Bill">Self-Bill</option>
+              <option value="Self-Adjust">Self-Adjust</option>
+            </Form.Control>
           </Form.Group>
 
           <Form.Group controlId="startdate">

@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import { VendorsNav, VendorNav } from "./TabNavs";
 
 class Vendor extends Component {
-  state = {};
+  state = {
+    view: "main",
+  };
   renderNavBar = () => {
     const { onTabContent, tabState } = this.props;
 
@@ -61,8 +63,15 @@ class Vendor extends Component {
   renderBills = () => {
     return (
       <div className="MyContent">
-        {" "}
-        <h1>Bills state FFU</h1>{" "}
+        <h1>Bills state FFU</h1>
+        <button
+          onClick={() => {
+            this.setState({ view: "not home" });
+            console.log(this.state);
+          }}
+        >
+          Select
+        </button>
       </div>
     );
   };
@@ -104,7 +113,7 @@ class Vendor extends Component {
                         onClick={() =>
                           onTabContent("vendorTab", [
                             ".b",
-                            ".actions",
+                            ".bills",
                             vendor.DispName,
                           ])
                         }

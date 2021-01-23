@@ -94,6 +94,22 @@
 }
 
 /* Policies */
+.InvoiceModalLines {
+  padding: 0%;
+}
+
+.InvoiceModalLines div table thead th,
+.InvoiceModalLines div table tbody td {
+  width: 20%;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.InvoiceModalLines div table tbody tr {
+  cursor: pointer;
+}
+
+/* Policies */
 .Policies div table thead .InitCell,
 .Policies div table tbody .InitCell {
   width: 30%;
@@ -112,7 +128,7 @@
   cursor: pointer;
 }
 
-/*Custome Button*/
+/*Customer Button*/
 
 .MyFormButton {
   padding: 10px 10px 10px 10px;

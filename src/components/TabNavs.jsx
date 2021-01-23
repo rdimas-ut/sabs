@@ -47,21 +47,11 @@ function CustomerNavBarButton(props) {
 export const CustomersNav = (props) => {
   let navLink = "nav-link ";
   const { onTabContent, tabState } = props;
-  var actionsClass =
-    tabState[1] === ".actions" ? navLink + "active" : navLink + "";
   var customersClass =
     tabState[1] === ".customers" ? navLink + "active" : navLink + "";
   return (
     <div className="MyNavBar">
       <ul className="nav nav-tabs">
-        <li className="nav-item">
-          <button
-            className={actionsClass}
-            onClick={() => onTabContent("customerTab", [".a", ".actions", ""])}
-          >
-            Actions
-          </button>
-        </li>
         <li className="nav-item">
           <button
             className={customersClass}
@@ -80,8 +70,6 @@ export const CustomersNav = (props) => {
 export const CustomerNav = (props) => {
   let navLink = "nav-link ";
   const { onTabContent, tabState } = props;
-  var actionsClass =
-    tabState[1] === ".actions" ? navLink + "active" : navLink + "";
   var invoicesClass =
     tabState[1] === ".invoices" ? navLink + "active" : navLink + "";
   var policiesClass =
@@ -92,16 +80,6 @@ export const CustomerNav = (props) => {
     <div className="MyNavBar">
       <h1>{tabState[2]}</h1>
       <ul className="nav nav-tabs">
-        <li className="nav-item">
-          <button
-            className={actionsClass}
-            onClick={() =>
-              onTabContent("customerTab", [".b", ".actions", tabState[2]])
-            }
-          >
-            Actions
-          </button>
-        </li>
         <li className="nav-item">
           <button
             className={invoicesClass}
@@ -151,22 +129,12 @@ export const CustomerNav = (props) => {
 export const VendorsNav = (props) => {
   let navLink = "nav-link ";
   const { onTabContent, tabState } = props;
-  var actionsClass =
-    tabState[1] === ".actions" ? navLink + "active" : navLink + "";
   var vendorsClass =
     tabState[1] === ".vendors" ? navLink + "active" : navLink + "";
 
   return (
     <div className="MyNavBar">
       <ul className="nav nav-tabs">
-        <li className="nav-item">
-          <button
-            className={actionsClass}
-            onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])}
-          >
-            Actions
-          </button>
-        </li>
         <li className="nav-item">
           <button
             className={vendorsClass}
@@ -183,26 +151,11 @@ export const VendorsNav = (props) => {
 export const VendorNav = (props) => {
   let navLink = "nav-link ";
   const { onTabContent, tabState } = props;
-  var actionsClass =
-    tabState[1] === ".actions" ? navLink + "active" : navLink + "";
-
   var invoicesClass =
     tabState[1] === ".bills" ? navLink + "active" : navLink + "";
-  var censusClass =
-    tabState[1] === ".census" ? navLink + "active" : navLink + "";
   return (
     <div className="MyNavBar">
       <ul className="nav nav-tabs">
-        <li className="nav-item">
-          <button
-            className={actionsClass}
-            onClick={() =>
-              onTabContent("vendorTab", [".b", ".actions", tabState[2]])
-            }
-          >
-            Actions
-          </button>
-        </li>
         <li className="nav-item">
           <button
             className={invoicesClass}
@@ -215,18 +168,8 @@ export const VendorNav = (props) => {
         </li>
         <li className="nav-item">
           <button
-            className={censusClass}
-            onClick={() =>
-              onTabContent("vendorTab", [".b", ".census", tabState[2]])
-            }
-          >
-            Census
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
             className={navLink}
-            onClick={() => onTabContent("vendorTab", [".a", ".actions", ""])}
+            onClick={() => onTabContent("vendorTab", [".a", ".vendors", ""])}
           >
             Back
           </button>

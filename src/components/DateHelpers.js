@@ -15,4 +15,28 @@ function myTime(dateString) {
   return date.getTime() + date.getTimezoneOffset() * 60 * 1000;
 }
 
-export { myDate, myTime };
+function myDateDisp(dateInt, includeDay = false) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const date = new Date(dateInt);
+  const year = date.getFullYear();
+  const day =
+    date.getDate() < 10 ? "0" + String(date.getDate()) : String(date.getDate());
+  const month = monthNames[date.getMonth()].substring(0, 3);
+  return includeDay ? day + "-" + month + "-" + year : month + "-" + year;
+}
+
+export { myDate, myTime, myDateDisp };

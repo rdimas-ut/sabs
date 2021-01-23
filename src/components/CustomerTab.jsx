@@ -3,7 +3,7 @@ import { CustomersNav, CustomerNav } from "./TabNavs";
 import { PolicyModal } from "./PolicyModal";
 import { CensusModal } from "./CensusModal";
 import { InvoiceModal } from "./InvoiceModal";
-import { myDate } from "./DateHelpers";
+import { myDateDisp } from "./DateHelpers";
 // const { ipcRenderer } = window.require('electron');
 
 class Customer extends Component {
@@ -151,7 +151,9 @@ class Customer extends Component {
                       }}
                     >
                       <td className="InitCell">
-                        {this.renderCellContent(myDate(pol.StartDate))}
+                        {this.renderCellContent(
+                          myDateDisp(pol.StartDate, true)
+                        )}
                       </td>
                       <td className="SecondCell">{String(pol.MIC)}</td>
                       <td className="SecondCell">{String(pol.MGU)}</td>
@@ -200,7 +202,7 @@ class Customer extends Component {
                       }}
                     >
                       <td className="CovDate">
-                        {this.renderCellContent(myDate(cen.CovDate))}
+                        {this.renderCellContent(myDateDisp(cen.CovDate))}
                       </td>
                       <td className="Tier">{String(cen.EE)}</td>
                       <td className="Tier">{String(cen.ES)}</td>
@@ -246,7 +248,7 @@ class Customer extends Component {
                         onClick={() =>
                           onTabContent("customerTab", [
                             ".b",
-                            ".actions",
+                            ".invoices",
                             cust.DispName,
                           ])
                         }

@@ -27,6 +27,11 @@ class App extends Component {
     // Tab state as define by two var
     customerTab: [".a", ".customers", ""],
     vendorTab: [".a", ".vendors", ""],
+    // Tab States
+    customersTab: "customers",
+    customersTabCustomersSelection: "",
+    vendorsTab: "vendors",
+    vendorsTabVendorsSelection: "",
 
     errorModal: false,
     errorModalTitle: "",
@@ -68,6 +73,9 @@ class App extends Component {
     FeesPremiumParams,
     BillFeesParams
   ) => {
+    console.log("Policy Params");
+    console.log(PolicyParams);
+
     try {
       const selectPolicy =
         "select * from Policy where PID = " + String(PolicyParams.PID);
@@ -266,15 +274,12 @@ class App extends Component {
   };
 
   handleTabContent = (tab, tabState) => {
-    if (tab === "customerTab") {
-      this.setState({ customerTab: tabState });
-    } else if (tab === "vendorTab") {
-      this.setState({ vendorTab: tabState });
-    }
+    this.setState({ [tab]: tabState });
   };
 
-  renderContent() {
+  render() {
     const {
+      tab,
       customers,
       vendors,
       policies,
@@ -306,31 +311,31 @@ class App extends Component {
       tabState: vendorTab,
     };
 
-    const testButtons = {
+    const qboButtons = {
       qboSignOut: this.qboSignOut,
       qboSignIn: this.qboSignIn,
       refreshVendor: this.refreshVendor,
       refreshCustomer: this.refreshCustomer,
     };
-
-    const { tab } = this.state;
-    const com = [
-      <Home {...testButtons} />,
-      <Customer {...cProps} />,
-      <Vendor {...vProps} />,
-    ];
-
-    const val = ["home", "customer", "vendor"];
-    const cur = com.filter((e, index) => val[index] === tab);
-    return cur[0];
-  }
-
-  render() {
-    const { tab } = this.state;
     return (
       <React.Fragment>
         <Sidebar tab={tab} onTab={this.handleTab} />
-        <div className="content">{this.renderContent()}</div>
+        {tab === "home" && (
+          <div className="content">
+            <Home {...qboButtons} />
+          </div>
+        )}
+        {tab === "customer" && (
+          <div className="content">
+            <Customer {...cProps} />
+          </div>
+        )}
+
+        {tab === "vendor" && (
+          <div className="content">
+            <Vendor {...vProps} />
+          </div>
+        )}
         <ErrorModal
           show={this.state.errorModal}
           onHide={this.hideErrorModal}

@@ -1,12 +1,20 @@
+const {
+  default: installExtension,
+  REACT_DEVELOPER_TOOLS,
+} = require("electron-devtools-installer");
 const { app, BrowserWindow } = require("electron");
 const { ipcMain } = require("electron");
 const isDev = require("electron-is-dev");
 const path = require("path");
 const ExcelJS = require("exceljs");
 const https = require("https");
-const { parse, resolve } = require("path");
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log("An error occurred: ", err));
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
