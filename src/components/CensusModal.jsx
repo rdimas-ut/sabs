@@ -79,7 +79,7 @@ export function CensusModal(props) {
   };
 
   const handleReset = () => {
-    Object.keys(censusFormHooks).map(function (key) {
+    Object.keys(censusFormHooks).forEach(function (key) {
       censusFormHooks[key]("");
     });
     setUser("");

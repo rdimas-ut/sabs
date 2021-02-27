@@ -44,7 +44,7 @@ export const PolicyModal = (props) => {
     {
       fpid: "",
       id: String(Date.now()),
-      type: "",
+      product: "",
       vendor: "",
       calc: "",
       rate: "",
@@ -55,6 +55,7 @@ export const PolicyModal = (props) => {
     {
       bfid: "",
       id: String(Date.now()),
+      product: "",
       vendor: "",
       calc: "",
       rate: "",
@@ -63,7 +64,7 @@ export const PolicyModal = (props) => {
 
   const [excel, setExcel] = useState("");
 
-  // Polcy Form change state hooks
+  // Policy Form change state hooks
   const policyHooks = {
     mgu: setMGU,
     carrier: setCarrier,
@@ -167,7 +168,7 @@ export const PolicyModal = (props) => {
     npremfees.push({
       fpid: "",
       id: String(Date.now()),
-      type: "",
+      product: "",
       vendor: "",
       calc: "",
       rate: "",
@@ -185,6 +186,7 @@ export const PolicyModal = (props) => {
     nbillfees.push({
       fpid: "",
       id: String(Date.now()),
+      product: "",
       vendor: "",
       calc: "",
       rate: "",
@@ -238,7 +240,7 @@ export const PolicyModal = (props) => {
         .map((fp) => {
           var nfp = {
             PID: PID,
-            Type: fp.type,
+            Product: fp.product,
             Vendor: fp.vendor,
             Calc: fp.calc,
             Rate: Number(fp.rate),
@@ -253,6 +255,7 @@ export const PolicyModal = (props) => {
         .map((bf) => {
           var nbf = {
             PID: PID,
+            Product: bf.product,
             Vendor: bf.vendor,
             Calc: bf.calc,
             Rate: Number(bf.rate),
@@ -280,7 +283,7 @@ export const PolicyModal = (props) => {
   };
 
   const handleReset = () => {
-    Object.keys(policyHooks).map(function (key) {
+    Object.keys(policyHooks).forEach(function (key) {
       policyHooks[key]("");
     });
     setAggStruc("1-Tier");
@@ -293,7 +296,7 @@ export const PolicyModal = (props) => {
       {
         fpid: "",
         id: String(Date.now()),
-        type: "",
+        product: "",
         vendor: "",
         calc: "",
         rate: "",
@@ -303,6 +306,7 @@ export const PolicyModal = (props) => {
       {
         bfid: "",
         id: String(Date.now()),
+        product: "",
         vendor: "",
         calc: "",
         rate: "",
@@ -362,7 +366,7 @@ export const PolicyModal = (props) => {
         nfp.push({
           fpid: element.FPID,
           id: Math.floor(Math.random() * 10000 + 1),
-          type: "",
+          product: element.Product,
           vendor: element.Vendor,
           calc: element.Calc,
           rate: element.Rate,
@@ -371,7 +375,7 @@ export const PolicyModal = (props) => {
       nfp.push({
         fpid: "",
         id: String(Date.now()),
-        type: "",
+        product: "",
         vendor: "",
         calc: "",
         rate: "",
@@ -382,6 +386,7 @@ export const PolicyModal = (props) => {
         nbf.push({
           bfid: element.BFID,
           id: Math.floor(Math.random() * 10000 + 1),
+          product: element.Product,
           vendor: element.Vendor,
           calc: element.Calc,
           rate: element.Rate,
@@ -390,6 +395,7 @@ export const PolicyModal = (props) => {
       nbf.push({
         bfid: "",
         id: String(Date.now()),
+        product: "",
         vendor: "",
         calc: "",
         rate: "",
@@ -518,7 +524,7 @@ export const PolicyModal = (props) => {
             </Form.Control>
           </Form.Group>
 
-          <Form.Row className="MyFormRow">
+          <Form.Row className="specrates">
             {specstruc && (specstruc === "4-Tier" || specstruc === "2-Tier") && (
               <Form.Group as={Col} md="3" controlId="specee">
                 <Form.Label>EE</Form.Label>
@@ -592,7 +598,7 @@ export const PolicyModal = (props) => {
             </Form.Control>
           </Form.Group>
 
-          <Form.Row className="MyFormRow">
+          <Form.Row className="aggrates">
             {aggstruc && (aggstruc === "4-Tier" || aggstruc === "2-Tier") && (
               <Form.Group as={Col} md="3" controlId="aggee">
                 <Form.Label>EE</Form.Label>
@@ -652,7 +658,7 @@ export const PolicyModal = (props) => {
           {premfees.map((pf, i) => {
             return (
               <div key={pf.id}>
-                <Form.Row className="MyFormRow">
+                <Form.Row className="premfeesdetails">
                   <Form.Group as={Col} md="3" controlId={pf.id}>
                     <Form.Label>Vendor</Form.Label>
                     <Form.Control
@@ -672,6 +678,32 @@ export const PolicyModal = (props) => {
                     />
                   </Form.Group>
                   <Form.Group as={Col} md="3" controlId={pf.id}>
+                    <Form.Label>Product</Form.Label>
+                    <Form.Control
+                      disabled={!edit}
+                      value={pf.product}
+                      onChange={(e) =>
+                        dynamicChanges(
+                          premfees,
+                          setPremFees,
+                          pf.id,
+                          "product",
+                          e.target.value
+                        )
+                      }
+                      type="text"
+                      placeholder="Procuct"
+                      as="select"
+                      className="mr-sm-2"
+                      custom
+                    >
+                      <option value="">Choose...</option>
+                      {props.items.map((item) => {
+                        return <option value={item.Name}>{item.Name}</option>;
+                      })}
+                    </Form.Control>
+                  </Form.Group>
+                  <Form.Group as={Col} md="3" controlId={pf.id}>
                     <Form.Label>Calculation Method</Form.Label>
                     <Form.Control
                       disabled={!edit}
@@ -686,14 +718,31 @@ export const PolicyModal = (props) => {
                         )
                       }
                       type="text"
+                      as="select"
                       placeholder="Calculation Method"
-                    />
+                      className="mr-sm-2"
+                      custom
+                    >
+                      <option value="">Choose...</option>
+                      <option value="Flat Fee">Flat Fee</option>
+                      <option value="Flat Per Census EE">
+                        Flar Per Census EE
+                      </option>
+                      <option value="Flat Per Census ES">
+                        Flar Per Census ES
+                      </option>
+                      <option value="Flat Per Census EC">
+                        Flar Per Census EC
+                      </option>
+                      <option value="Flat Per Census EF">
+                        Flar Per Census EF
+                      </option>
+                      <option value="Flat Per Census Composite">
+                        Flar Per Census Composite
+                      </option>
+                    </Form.Control>
                   </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    md="3"
-                    controlId={"formPremFeeRate" + String(pf.id)}
-                  >
+                  <Form.Group as={Col} md="2" controlId={pf.id}>
                     <Form.Label>Rate</Form.Label>
                     <Form.Control
                       disabled={!edit}
@@ -708,6 +757,7 @@ export const PolicyModal = (props) => {
                         )
                       }
                       type="number"
+                      step=".01"
                       placeholder="Rate"
                     />
                   </Form.Group>
@@ -742,20 +792,20 @@ export const PolicyModal = (props) => {
 
           <h4>Vendor Fees</h4>
 
-          {billfees.map((pf, i) => {
+          {billfees.map((bf, i) => {
             return (
-              <div key={pf.id}>
+              <div key={bf.id}>
                 <Form.Row className="MyFormRow">
-                  <Form.Group as={Col} md="3" controlId={pf.id}>
+                  <Form.Group as={Col} md="3" controlId={bf.id}>
                     <Form.Label>Vendor</Form.Label>
                     <Form.Control
                       disabled={!edit}
-                      value={pf.vendor}
+                      value={bf.vendor}
                       onChange={(e) =>
                         dynamicChanges(
                           billfees,
                           setBillFees,
-                          pf.id,
+                          bf.id,
                           "vendor",
                           e.target.value
                         )
@@ -774,16 +824,44 @@ export const PolicyModal = (props) => {
                       })}
                     </Form.Control>
                   </Form.Group>
-                  <Form.Group as={Col} md="3" controlId={pf.id}>
-                    <Form.Label>Calculation Method</Form.Label>
+                  <Form.Group as={Col} md="3" controlId={bf.id}>
+                    <Form.Label>Account</Form.Label>
                     <Form.Control
                       disabled={!edit}
-                      value={pf.calc}
+                      value={bf.product}
                       onChange={(e) =>
                         dynamicChanges(
                           billfees,
                           setBillFees,
-                          pf.id,
+                          bf.id,
+                          "product",
+                          e.target.value
+                        )
+                      }
+                      type="text"
+                      placeholder="Procuct"
+                      as="select"
+                      className="mr-sm-2"
+                      custom
+                    >
+                      <option value="">Choose...</option>
+                      {props.accounts.map((account) => {
+                        return (
+                          <option value={account.Name}>{account.Name}</option>
+                        );
+                      })}
+                    </Form.Control>
+                  </Form.Group>
+                  <Form.Group as={Col} md="3" controlId={bf.id}>
+                    <Form.Label>Calculation Method</Form.Label>
+                    <Form.Control
+                      disabled={!edit}
+                      value={bf.calc}
+                      onChange={(e) =>
+                        dynamicChanges(
+                          billfees,
+                          setBillFees,
+                          bf.id,
                           "calc",
                           e.target.value
                         )
@@ -819,25 +897,22 @@ export const PolicyModal = (props) => {
                       </option>
                     </Form.Control>
                   </Form.Group>
-                  <Form.Group
-                    as={Col}
-                    md="3"
-                    controlId={"formPremFeeRate" + String(pf.id)}
-                  >
+                  <Form.Group as={Col} md="2" controlId={bf.id}>
                     <Form.Label>Rate</Form.Label>
                     <Form.Control
                       disabled={!edit}
-                      value={pf.rate}
+                      value={bf.rate}
                       onChange={(e) =>
                         dynamicChanges(
                           billfees,
                           setBillFees,
-                          pf.id,
+                          bf.id,
                           "rate",
                           e.target.value
                         )
                       }
                       type="number"
+                      step=".01"
                       placeholder="Rate"
                     />
                   </Form.Group>
@@ -857,7 +932,7 @@ export const PolicyModal = (props) => {
                     <div className="MyInlineButton">
                       <Button
                         disabled={!edit}
-                        onClick={() => deleteBillFee(pf.id)}
+                        onClick={() => deleteBillFee(bf.id)}
                         size="sm"
                         variant="danger"
                       >

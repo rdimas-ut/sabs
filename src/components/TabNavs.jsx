@@ -1,63 +1,17 @@
 import "./mystyles.css";
 
-function CustomerNavBarButton(props) {
-  const {
-    tabState,
-    showCensusModal,
-    showPolicyModal,
-    showInvoiceModal,
-  } = props;
-  if (tabState[1] === ".policies") {
-    return (
-      <li className="nav-item ml-auto">
-        <button
-          className="btn btn-primary MyNavBarButton"
-          onClick={showPolicyModal}
-        >
-          New
-        </button>
-      </li>
-    );
-  } else if (tabState[1] === ".census") {
-    return (
-      <li className="nav-item ml-auto">
-        <button
-          className="btn btn-primary MyNavBarButton"
-          onClick={showCensusModal}
-        >
-          New
-        </button>
-      </li>
-    );
-  } else if (tabState[1] === ".invoices") {
-    return (
-      <li className="nav-item ml-auto">
-        <button
-          className="btn btn-primary MyNavBarButton"
-          onClick={showInvoiceModal}
-        >
-          New
-        </button>
-      </li>
-    );
-  }
-  return;
-}
-
 export const CustomersNav = (props) => {
   let navLink = "nav-link ";
   const { onTabContent, tabState } = props;
   var customersClass =
-    tabState[1] === ".customers" ? navLink + "active" : navLink + "";
+    tabState[1] === "customers" ? navLink + "active" : navLink + "";
   return (
     <div className="MyNavBar">
       <ul className="nav nav-tabs">
         <li className="nav-item">
           <button
             className={customersClass}
-            onClick={() =>
-              onTabContent("customerTab", [".a", ".customers", ""])
-            }
+            onClick={() => onTabContent("customersTab", ["a", "customers", ""])}
           >
             Customers
           </button>
@@ -69,13 +23,20 @@ export const CustomersNav = (props) => {
 
 export const CustomerNav = (props) => {
   let navLink = "nav-link ";
-  const { onTabContent, tabState } = props;
+  const {
+    onTabContent,
+    tabState,
+    showCensusModal,
+    showPolicyModal,
+    showInvoiceModal,
+  } = props;
+
   var invoicesClass =
-    tabState[1] === ".invoices" ? navLink + "active" : navLink + "";
+    tabState[1] === "invoices" ? navLink + "active" : navLink + "";
   var policiesClass =
-    tabState[1] === ".policies" ? navLink + "active" : navLink + "";
+    tabState[1] === "policies" ? navLink + "active" : navLink + "";
   var censusClass =
-    tabState[1] === ".census" ? navLink + "active" : navLink + "";
+    tabState[1] === "census" ? navLink + "active" : navLink + "";
   return (
     <div className="MyNavBar">
       <h1>{tabState[2]}</h1>
@@ -84,7 +45,7 @@ export const CustomerNav = (props) => {
           <button
             className={invoicesClass}
             onClick={() =>
-              onTabContent("customerTab", [".b", ".invoices", tabState[2]])
+              onTabContent("customersTab", ["b", "invoices", tabState[2]])
             }
           >
             Invoices
@@ -94,7 +55,7 @@ export const CustomerNav = (props) => {
           <button
             className={policiesClass}
             onClick={() =>
-              onTabContent("customerTab", [".b", ".policies", tabState[2]])
+              onTabContent("customersTab", ["b", "policies", tabState[2]])
             }
           >
             Policies
@@ -104,7 +65,7 @@ export const CustomerNav = (props) => {
           <button
             className={censusClass}
             onClick={() =>
-              onTabContent("customerTab", [".b", ".census", tabState[2]])
+              onTabContent("customersTab", ["b", "census", tabState[2]])
             }
           >
             Census
@@ -113,14 +74,42 @@ export const CustomerNav = (props) => {
         <li className="nav-item">
           <button
             className={navLink}
-            onClick={() =>
-              onTabContent("customerTab", [".a", ".customers", ""])
-            }
+            onClick={() => onTabContent("customersTab", ["a", "customers", ""])}
           >
             Back
           </button>
         </li>
-        {CustomerNavBarButton(props)}
+
+        {tabState[1] === "policies" && (
+          <li className="nav-item ml-auto">
+            <button
+              className="btn btn-primary MyNavBarButton"
+              onClick={showPolicyModal}
+            >
+              New
+            </button>
+          </li>
+        )}
+        {tabState[1] === "census" && (
+          <li className="nav-item ml-auto">
+            <button
+              className="btn btn-primary MyNavBarButton"
+              onClick={showCensusModal}
+            >
+              New
+            </button>
+          </li>
+        )}
+        {tabState[1] === "invoices" && (
+          <li className="nav-item ml-auto">
+            <button
+              className="btn btn-primary MyNavBarButton"
+              onClick={showInvoiceModal}
+            >
+              New
+            </button>
+          </li>
+        )}
       </ul>
     </div>
   );
@@ -128,9 +117,8 @@ export const CustomerNav = (props) => {
 
 export const VendorsNav = (props) => {
   let navLink = "nav-link ";
-  const { onTabContent, tabState } = props;
   var vendorsClass =
-    tabState[1] === ".vendors" ? navLink + "active" : navLink + "";
+    props.tabState[1] === "vendors" ? navLink + "active" : navLink + "";
 
   return (
     <div className="MyNavBar">
@@ -138,7 +126,9 @@ export const VendorsNav = (props) => {
         <li className="nav-item">
           <button
             className={vendorsClass}
-            onClick={() => onTabContent("vendorTab", [".a", ".vendors", ""])}
+            onClick={() => {
+              props.onTabContent("vendorsTab", ["a", "vendors", ""]);
+            }}
           >
             Vendors
           </button>
@@ -150,18 +140,21 @@ export const VendorsNav = (props) => {
 
 export const VendorNav = (props) => {
   let navLink = "nav-link ";
-  const { onTabContent, tabState } = props;
   var invoicesClass =
-    tabState[1] === ".bills" ? navLink + "active" : navLink + "";
+    props.tabState[1] === "bills" ? navLink + "active" : navLink + "";
   return (
     <div className="MyNavBar">
       <ul className="nav nav-tabs">
         <li className="nav-item">
           <button
             className={invoicesClass}
-            onClick={() =>
-              onTabContent("vendorTab", [".b", ".bills", tabState[2]])
-            }
+            onClick={() => {
+              props.onTabContent("vendorsTab", [
+                "b",
+                "bills",
+                props.tabState[2],
+              ]);
+            }}
           >
             Bills
           </button>
@@ -169,7 +162,9 @@ export const VendorNav = (props) => {
         <li className="nav-item">
           <button
             className={navLink}
-            onClick={() => onTabContent("vendorTab", [".a", ".vendors", ""])}
+            onClick={() => {
+              props.onTabContent("vendorsTab", ["a", "vendors", ""]);
+            }}
           >
             Back
           </button>

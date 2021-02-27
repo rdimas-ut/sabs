@@ -4,12 +4,7 @@ class Home extends Component {
   state = {};
 
   render() {
-    const {
-      qboSignIn,
-      qboSignOut,
-      refreshCustomer,
-      refreshVendor,
-    } = this.props;
+    const { qboSignIn, qboSignOut, refreshQBOData } = this.props;
     return (
       <div className="MyContent">
         <h1> Quickbook Controls </h1>
@@ -25,13 +20,8 @@ class Home extends Component {
             </button>
           </div>
           <div className="MyFormButton">
-            <button onClick={refreshCustomer} className="btn btn-primary">
-              Refresh Customer
-            </button>
-          </div>
-          <div className="MyFormButton">
-            <button onClick={refreshVendor} className="btn btn-primary">
-              Refresh Vendor
+            <button onClick={refreshQBOData} className="btn btn-primary">
+              Refresh QBO Data
             </button>
           </div>
         </div>

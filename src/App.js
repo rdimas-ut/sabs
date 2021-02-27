@@ -24,14 +24,11 @@ class App extends Component {
     censuspremium: [],
     feespremium: [],
     billfees: [],
+    items: [],
+    accounts: [],
     // Tab state as define by two var
-    customerTab: [".a", ".customers", ""],
-    vendorTab: [".a", ".vendors", ""],
-    // Tab States
-    customersTab: "customers",
-    customersTabCustomersSelection: "",
-    vendorsTab: "vendors",
-    vendorsTabVendorsSelection: "",
+    customersTab: ["a", "customers", ""],
+    vendorsTab: ["a", "vendors", ""],
 
     errorModal: false,
     errorModalTitle: "",
@@ -48,6 +45,8 @@ class App extends Component {
     this.getCensusPremium();
     this.getFeesPremium();
     this.getBillFees();
+    this.getItems();
+    this.getAccounts();
     this.timerQBO = setInterval(() => this.isUserSignedInToQBO(), 1000);
   }
 
@@ -171,14 +170,11 @@ class App extends Component {
     this.getState();
   };
 
-  refreshCustomer = async () => {
-    await ipcRenderer.invoke("refreshCustomer");
-    this.getCustomers();
-  };
-
-  refreshVendor = async () => {
-    await ipcRenderer.invoke("refreshVendor");
-    this.getVendors();
+  refreshQBOData = async () => {
+    await ipcRenderer.invoke("qbo", "refreshCustomer");
+    await ipcRenderer.invoke("qbo", "refreshVendor");
+    await ipcRenderer.invoke("qbo", "refreshItem");
+    await ipcRenderer.invoke("qbo", "refreshAccount");
   };
 
   getState = async () => {
@@ -191,42 +187,51 @@ class App extends Component {
   };
 
   getCustomers = async () => {
+    console.log("getCustomers");
+    const commd = "select * from Customer";
     try {
-      const result = await ipcRenderer.invoke("getCustomers");
-      this.setState({ customers: result });
-    } catch (e) {
-      console.log(e);
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ customers: result.res });
+    } catch (err) {
+      console.error(err);
     }
   };
 
   getVendors = async () => {
+    console.log("getVendors");
+    const commd = "select * from Vendor";
     try {
-      const result = await ipcRenderer.invoke("getVendors");
-      this.setState({ vendors: result });
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ vendors: result.res });
     } catch (err) {
       console.error(err);
     }
   };
 
   getPolicies = async () => {
+    console.log("getPolicies");
+    const commd = "select * from Policy";
     try {
-      const result = await ipcRenderer.invoke("getPolicies");
-      this.setState({ policies: result });
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ policies: result.res });
     } catch (err) {
       console.error(err);
     }
   };
 
   getCensus = async () => {
+    console.log("getCensus");
+    const commd = "select * from Census";
     try {
-      const result = await ipcRenderer.invoke("getCensus");
-      this.setState({ census: result });
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ census: result.res });
     } catch (err) {
       console.error(err);
     }
   };
 
   getCensusPremium = async () => {
+    console.log("getCensusPremium");
     const commd = "select * from CensusPremium";
     try {
       const result = await ipcRenderer.invoke("execute", commd);
@@ -237,6 +242,7 @@ class App extends Component {
   };
 
   getFeesPremium = async () => {
+    console.log("getFeesPremium");
     const commd = "select * from FeesPremium";
     try {
       const result = await ipcRenderer.invoke("execute", commd);
@@ -247,10 +253,33 @@ class App extends Component {
   };
 
   getBillFees = async () => {
+    console.log("getBillFees");
     const commd = "select * from BillFees";
     try {
       const result = await ipcRenderer.invoke("execute", commd);
       this.setState({ billfees: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getItems = async () => {
+    console.log("getItems");
+    const commd = "select * from Item";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ items: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getAccounts = async () => {
+    console.log("getAccounts");
+    const commd = "select * from Account";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ accounts: result.res });
     } catch (err) {
       console.error(err);
     }
@@ -287,8 +316,10 @@ class App extends Component {
       censuspremium,
       billfees,
       feespremium,
-      customerTab,
-      vendorTab,
+      customersTab,
+      vendorsTab,
+      items,
+      accounts,
     } = this.state;
     const cProps = {
       policies,
@@ -298,7 +329,9 @@ class App extends Component {
       censuspremium,
       billfees,
       feespremium,
-      tabState: customerTab,
+      items,
+      accounts,
+      tabState: customersTab,
       onTabContent: this.handleTabContent,
       onCensusInsert: this.handleCensusInsert,
       onPolicyInsert: this.handlePolicyInsert,
@@ -308,14 +341,13 @@ class App extends Component {
     const vProps = {
       vendors,
       onTabContent: this.handleTabContent,
-      tabState: vendorTab,
+      tabState: vendorsTab,
     };
 
     const qboButtons = {
       qboSignOut: this.qboSignOut,
       qboSignIn: this.qboSignIn,
-      refreshVendor: this.refreshVendor,
-      refreshCustomer: this.refreshCustomer,
+      refreshQBOData: this.refreshQBOData,
     };
     return (
       <React.Fragment>

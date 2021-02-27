@@ -290,15 +290,12 @@ ipcMain.handle("readExcel", async (e, path) => {
 });
 
 ipcMain.handle("execute", async (e, commd) => {
-  console.log("execute");
   var parsedData;
   try {
     parsedData = await execute(commd);
   } catch (err) {
     console.log(err);
   }
-
-  console.log(parsedData);
   return parsedData;
 });
 
@@ -341,6 +338,33 @@ ipcMain.handle("update", async (e, tableName, dataDict, searchDict) => {
   return parsedData;
 });
 
+ipcMain.handle("qbo", async (e, apiCallName) => {
+  const request = new Promise((resolve, reject) => {
+    reqOptions = {
+      method: "GET",
+      headers: {
+        call: apiCallName,
+        parameters: "{}",
+      },
+    };
+
+    let req = https.request(
+      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
+      reqOptions,
+      (res) => {
+        const { statusCode } = res;
+        console.log(statusCode);
+        resolve(statusCode);
+      }
+    );
+
+    req.end();
+    req.on("error", (err) => {
+      reject(err);
+    });
+  });
+});
+
 ipcMain.handle("getState", async () => {
   console.log("getState");
   var parsedData;
@@ -353,77 +377,10 @@ ipcMain.handle("getState", async () => {
   return parsedData;
 });
 
-ipcMain.handle("getCustomers", async () => {
-  console.log("getCustomers");
-  var parsedData;
-  try {
-    parsedData = await getCustomersRequest();
-  } catch (err) {
-    console.log(err);
-  }
-
-  console.log(parsedData);
-  return parsedData;
-});
-
-ipcMain.handle("getVendors", async () => {
-  console.log("getVendors");
-  var parsedData;
-  try {
-    parsedData = await getVendorsRequest();
-  } catch (err) {
-    console.error(err);
-  }
-  console.log(parsedData);
-  return parsedData;
-});
-
-ipcMain.handle("getPolicies", async () => {
-  console.log("getPolicies");
-  var parsedData;
-  try {
-    parsedData = await getPoliciesRequest();
-  } catch (err) {
-    console.error(err);
-  }
-  console.log(parsedData);
-  return parsedData;
-});
-
-ipcMain.handle("getCensus", async () => {
-  console.log("getCensus");
-  var parsedData;
-  try {
-    parsedData = await getCensusReques();
-  } catch (err) {
-    console.error(err);
-  }
-  console.log(parsedData);
-  return parsedData;
-});
-
 ipcMain.handle("qboSignOut", async () => {
   console.log("qboSignOut");
   try {
     await revokeTokens();
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-ipcMain.handle("refreshCustomer", async () => {
-  console.log("refreshCustomer");
-  try {
-    await refreshCustomer();
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-ipcMain.handle("refrershVendor", async () => {
-  console.log("refrershVendor");
-  try {
-    await refreshVendor();
   } catch (err) {
     console.log(err);
   }
@@ -497,167 +454,7 @@ function getStateRequest() {
 
         res.on("end", () => {
           try {
-            console.log(rawData);
             parsedData = JSON.parse(rawData);
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
-
-    req.end();
-
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-function getCustomersRequest() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "execute",
-        parameters: JSON.stringify({ commd: "select * from Customer" }),
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            parsedData = JSON.parse(rawData).res;
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
-
-    req.end();
-
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-function getVendorsRequest() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "execute",
-        parameters: JSON.stringify({ commd: "select * from Vendor" }),
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        let rawData = "";
-        res.setEncoding("utf-8");
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            parsedData = JSON.parse(rawData).res;
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
-
-    req.end();
-
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-function getPoliciesRequest() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "execute",
-        parameters: JSON.stringify({ commd: "select * from Policy" }),
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        let rawData = "";
-        res.setEncoding("utf-8");
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            parsedData = JSON.parse(rawData).res;
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
-
-    req.end();
-
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-function getCensusReques() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "execute",
-        parameters: JSON.stringify({ commd: "select * from Census" }),
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        let rawData = "";
-        res.setEncoding("utf-8");
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            parsedData = JSON.parse(rawData).res;
             resolve(parsedData);
           } catch (err) {
             console.error(err.message);
@@ -702,61 +499,6 @@ function revokeTokens() {
   });
 }
 
-function refreshCustomer() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "refreshCustomer",
-        parameters: "{}",
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        const { statusCode } = res;
-
-        console.log(statusCode);
-        resolve(statusCode);
-      }
-    );
-
-    req.end();
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
-function refreshVendor() {
-  return new Promise((resolve, reject) => {
-    reqOptions = {
-      method: "GET",
-      headers: {
-        call: "refreshVendor",
-        parameters: "{}",
-      },
-    };
-
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        const { statusCode } = res;
-        console.log(statusCode);
-        resolve(statusCode);
-      }
-    );
-
-    req.end();
-    req.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
-
 function execute(commd) {
   return new Promise((resolve, reject) => {
     reqOptions = {
@@ -778,7 +520,6 @@ function execute(commd) {
         });
         res.on("end", () => {
           try {
-            console.log(rawData);
             parsedData = JSON.parse(rawData);
             resolve(parsedData);
           } catch (err) {

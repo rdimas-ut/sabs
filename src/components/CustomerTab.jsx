@@ -43,73 +43,6 @@ class Customer extends Component {
     this.setState({ invoiceModal: false, selectedInvoice: "" });
   };
 
-  renderNavBar = () => {
-    const { onTabContent, tabState } = this.props;
-
-    const NavBarProps = {
-      onTabContent,
-      tabState,
-      showCensusModal: this.showCensusModal,
-      showPolicyModal: this.showPolicyModal,
-      showInvoiceModal: this.showInvoiceModal,
-    };
-
-    if (tabState[0] === ".a") {
-      // Customer Tab Main Page Nav Bar
-      return <CustomersNav {...NavBarProps} />;
-    } else if (tabState[0] === ".b") {
-      // Customer Page Nav Bar
-      return <CustomerNav {...NavBarProps} />;
-    } else if (tabState[0] === ".c") {
-      // Reserved
-    }
-
-    return (
-      <div className="MyNavBar">
-        <h1>Nondefined state</h1>
-      </div>
-    );
-  };
-
-  renderTabContent = () => {
-    const { tabState } = this.props;
-
-    if (tabState[0] === ".a") {
-      if (tabState[1] === ".customers") {
-        return this.renderCustomers();
-      } else if (tabState[1] === ".actions") {
-        return this.renderActions();
-      }
-    } else if (tabState[0] === ".b") {
-      if (tabState[1] === ".actions") {
-        return this.renderActions();
-      } else if (tabState[1] === ".invoices") {
-        return this.renderInvoices();
-      } else if (tabState[1] === ".policies") {
-        return this.renderPolicies();
-      } else if (tabState[1] === ".census") {
-        return this.renderCensus();
-      }
-    } else if (tabState[0] === ".c") {
-      // Reserved
-    }
-
-    return (
-      <div className="MyContent">
-        {" "}
-        <h1>Nondefined state</h1>{" "}
-      </div>
-    );
-  };
-
-  renderActions = () => {
-    return (
-      <div className="MyContent">
-        <h1>Actions table FFU</h1>{" "}
-      </div>
-    );
-  };
-
   renderInvoices = () => {
     return (
       <div className="MyContent">
@@ -246,9 +179,9 @@ class Customer extends Component {
                     <tr>
                       <td
                         onClick={() =>
-                          onTabContent("customerTab", [
-                            ".b",
-                            ".invoices",
+                          onTabContent("customersTab", [
+                            "b",
+                            "invoices",
                             cust.DispName,
                           ])
                         }
@@ -277,10 +210,25 @@ class Customer extends Component {
   }
 
   render() {
+    const { onTabContent, tabState } = this.props;
+
+    const NavBarProps = {
+      onTabContent,
+      tabState,
+      showCensusModal: this.showCensusModal,
+      showPolicyModal: this.showPolicyModal,
+      showInvoiceModal: this.showInvoiceModal,
+    };
+
     return (
       <div>
-        {this.renderNavBar()}
-        {this.renderTabContent()}
+        {tabState[0] === "a" && <CustomersNav {...NavBarProps} />}
+        {tabState[0] === "b" && <CustomerNav {...NavBarProps} />}
+
+        {tabState[1] === "customers" && this.renderCustomers()}
+        {tabState[1] === "census" && this.renderCensus()}
+        {tabState[1] === "policies" && this.renderPolicies()}
+        {tabState[1] === "invoices" && this.renderInvoices()}
         <CensusModal
           selectedCensus={this.state.selectedCensus}
           newCensus={this.state.newCensus}
@@ -295,6 +243,8 @@ class Customer extends Component {
           censuspremium={this.props.censuspremium}
           billfees={this.props.billfees}
           feespremium={this.props.feespremium}
+          items={this.props.items}
+          accounts={this.props.accounts}
           onPolicyInsert={this.props.onPolicyInsert}
           onPolicyDelete={this.props.onPolicyDelete}
           tabState={this.props.tabState}
@@ -302,6 +252,11 @@ class Customer extends Component {
           onHide={this.hidePolicyModal}
         />
         <InvoiceModal
+          customer={this.props.tabState[2]}
+          policies={this.props.policies}
+          census={this.props.census}
+          feespremium={this.props.feespremium}
+          censuspremium={this.props.censuspremium}
           show={this.state.invoiceModal}
           onHide={this.hideInvoiceModal}
         />

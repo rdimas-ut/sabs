@@ -3,38 +3,217 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Col } from "react-bootstrap";
-import { myTime, myDate } from "./DateHelpers";
+import { myDate } from "./DateHelpers";
+import { useInterval } from "./CustomerHooks";
 
 export const InvoiceModal = (props) => {
+  const [policy, setPolicy] = useState("");
+  const [billingtype, setBillingType] = useState("");
+  const [invoicemonth, setInvoiceMonth] = useState("");
+
   const [ee, setEE] = useState("");
   const [es, setES] = useState("");
   const [ec, setEC] = useState("");
   const [ef, setEF] = useState("");
 
-  const [eeDis, setEEDis] = useState(false);
-  const [esDis, setESDis] = useState(false);
-  const [ecDis, setECDis] = useState(false);
-  const [efDis, setEFDis] = useState(false);
+  // Adjustments in census
+  const [adjust, setAdjust] = useState([]);
 
-  const censusValues = [ee, es, ec, ef];
-  const censusFormHooks = {
-    ee: setEE,
-    es: setES,
-    ec: setEC,
-    ef: setEF,
-  };
-  const handleFormChanges = (event) => {
-    censusFormHooks[event.target.id](event.target.value);
-  };
+  // Derived from date
+  const [feespremium, setFeesPremium] = useState([]);
+  const [censuspremium, setCensusPremium] = useState([]);
 
   // Form validation and composite calculation hooks
   const [compositeValue, setCompositeValue] = useState("0");
 
-  useEffect(() => {
+  // Line array
+  const [lines, setLines] = useState([]);
+
+  // Total Array
+  const [total, setTotal] = useState("");
+
+  const generate = () => {
+    // Creates and array with filtered policies by customer
+    var filteredpolicies = props.policies.filter(
+      (policy) => policy.Customer === props.customer
+    );
+
+    var filteredcensus = props.census.filter(
+      (cen) => cen.Customer === props.customer
+    );
+    filteredcensus.sort((a, b) => (a.CovDate < b.CovDate ? 1 : -1));
+
+    if (invoicemonth && filteredpolicies.length) {
+      // filters policies by date which their should only be one or none
+      filteredpolicies = filteredpolicies.filter((policy) => {
+        var inter = invoicemonth.split("-");
+        var current = parseInt(inter[0]) * 12 + parseInt(inter[1]);
+        inter = myDate(policy.StartDate).split("-");
+        var inf = parseInt(inter[0]) * 12 + parseInt(inter[1]);
+        var sup = parseInt(policy.MIC) + inf;
+
+        return inf <= current && current < sup;
+      });
+
+      // uses the policy to set rates and bill lines
+      if (filteredpolicies.length && filteredcensus.length) {
+        var validcensus = filteredcensus[0];
+        if (!ee && !es && !ec && !ef) {
+          setEE(validcensus.EE);
+          setEC(validcensus.EC);
+          setES(validcensus.ES);
+          setEF(validcensus.EF);
+        }
+      }
+
+      var validpolicy = filteredpolicies[0];
+      var filteredfeespremium = props.feespremium.filter(
+        (fee) => fee.PID === validpolicy.PID
+      );
+      var filteredcensuspremium = props.censuspremium.filter(
+        (fee) => fee.PID === validpolicy.PID
+      );
+      setBillingType(validpolicy.BillingType);
+      setPolicy(validpolicy.Carrier + " " + myDate(validpolicy.StartDate));
+      setFeesPremium(filteredfeespremium);
+      setCensusPremium(filteredcensuspremium);
+    } else {
+      setFeesPremium([]);
+      setCensusPremium([]);
+      setAdjust([]);
+    }
+  };
+
+  const createLines = () => {
+    var newLines = [];
+    if (censuspremium) {
+      censuspremium.forEach((cp) => {
+        if (cp.TierStruc === "1-Tier") {
+          newLines.push({
+            Description: "Comp",
+            Product_Service: cp.Type,
+            Rate: cp.EF,
+            Lives: parseInt(compositeValue),
+            Amount: (parseInt(compositeValue) * cp.EF).toFixed(2),
+          });
+        } else if (cp.TierStruc === "2-Tier") {
+          newLines.push({
+            Description: "EE",
+            Product_Service: cp.Type,
+            Rate: cp.EE,
+            Lives: parseInt(ee),
+            Amount: (parseInt(ee) * cp.EE).toFixed(2),
+          });
+          newLines.push({
+            Description: "EF",
+            Product_Service: cp.Type,
+            Rate: cp.EF,
+            Lives: parseInt(compositeValue) - parseInt(ee),
+            Amount: ((parseInt(compositeValue) - parseInt(ee)) * cp.EF).toFixed(
+              2
+            ),
+          });
+        } else if (cp.TierStruc === "4-Tier") {
+          newLines.push({
+            Description: "EE",
+            Product_Service: cp.Type,
+            Rate: cp.EE,
+            Lives: parseInt(ee),
+            Amount: (parseInt(ee) * cp.EE).toFixed(2),
+          });
+          newLines.push({
+            Description: "ES",
+            Product_Service: cp.Type,
+            Rate: cp.ES,
+            Lives: parseInt(es),
+            Amount: (parseInt(es) * cp.ES).toFixed(2),
+          });
+          newLines.push({
+            Description: "EC",
+            Product_Service: cp.Type,
+            Rate: cp.EC,
+            Lives: parseInt(ec),
+            Amount: (parseInt(ec) * cp.EC).toFixed(2),
+          });
+          newLines.push({
+            Description: "EF",
+            Product_Service: cp.Type,
+            Rate: cp.EF,
+            Lives: parseInt(ef),
+            Amount: (parseInt(ef) * cp.EF).toFixed(2),
+          });
+        }
+      });
+    }
+
+    if (feespremium) {
+      console.log(feespremium);
+      feespremium.forEach((fp) => {
+        if (fp.Calc === "Flat Fee") {
+          newLines.push({
+            Description: "Flat Fee",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        } else if (fp.Calc === "Flat Per Census EE") {
+          newLines.push({
+            Description: "Flat Per Census EE",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        } else if (fp.Calc === "Flat Per Census ES") {
+          newLines.push({
+            Description: "Flat Per Census ES",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        } else if (fp.Calc === "Flat Per Census EC") {
+          newLines.push({
+            Description: "Flat Per Census EC",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        } else if (fp.Calc === "Flat Per Census EF") {
+          newLines.push({
+            Description: "Flat Per Census EF",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        } else if (fp.Calc === "Flat Per Census Composite") {
+          newLines.push({
+            Description: "Flat Per Census Composite",
+            Product_Service: fp.Product,
+            Rate: fp.Rate,
+            Lives: 1,
+            Amount: fp.Rate,
+          });
+        }
+      });
+    }
+    setLines(newLines);
+    console.log(newLines);
+  };
+
+  useInterval(() => {
+    const censusValues = [ee, es, ec, ef];
     setCompositeValue(
       String(censusValues.reduce((a, b) => Number(a) + Number(b)))
     );
-  });
+    setTotal();
+  }, 1000);
+
+  useInterval(generate, 1000);
+  useInterval(createLines, 100);
 
   return (
     <Modal
@@ -53,7 +232,11 @@ export const InvoiceModal = (props) => {
           <Form.Group controlId="policy">
             <Form.Label>Policy</Form.Label>
             <Form.Control
-              name="policy"
+              value={policy}
+              onChange={(event) => {
+                setPolicy(event.target.value);
+              }}
+              disabled
               type="text"
               placeholder="Carrier-DD-MMM-YYY"
             />
@@ -62,15 +245,25 @@ export const InvoiceModal = (props) => {
           <Form.Group controlId="billingtype">
             <Form.Label>Billing Type</Form.Label>
             <Form.Control
-              name="billingtype"
+              value={billingtype}
+              onChange={(event) => {
+                setBillingType(event.target.value);
+              }}
+              disabled
               type="text"
               placeholder="Census/Self-Bill/Self-Adjust"
             />
           </Form.Group>
 
-          <Form.Group controlId="covdate">
+          <Form.Group controlId="invicemonth">
             <Form.Label>Invoice Month</Form.Label>
-            <Form.Control name="covdate" type="month" />
+            <Form.Control
+              value={invoicemonth}
+              onChange={(event) => {
+                setInvoiceMonth(event.target.value);
+              }}
+              type="month"
+            />
           </Form.Group>
 
           <h4>Census</h4>
@@ -80,8 +273,9 @@ export const InvoiceModal = (props) => {
               <Form.Label>EE</Form.Label>
               <Form.Control
                 value={ee}
-                onChange={handleFormChanges}
-                disabled={eeDis}
+                onChange={(event) => {
+                  setEE(event.target.value);
+                }}
                 type="number"
                 step="1"
                 placeholder="0"
@@ -90,9 +284,10 @@ export const InvoiceModal = (props) => {
             <Form.Group as={Col} md="2" controlId="es">
               <Form.Label>ES</Form.Label>
               <Form.Control
-                disabled={esDis}
                 value={es}
-                onChange={handleFormChanges}
+                onChange={(event) => {
+                  setES(event.target.value);
+                }}
                 type="number"
                 step="1"
                 placeholder="0"
@@ -101,9 +296,10 @@ export const InvoiceModal = (props) => {
             <Form.Group as={Col} md="2" controlId="ec">
               <Form.Label>EC</Form.Label>
               <Form.Control
-                disabled={ecDis}
                 value={ec}
-                onChange={handleFormChanges}
+                onChange={(event) => {
+                  setEC(event.target.value);
+                }}
                 type="number"
                 step="1"
                 placeholder="0"
@@ -113,8 +309,9 @@ export const InvoiceModal = (props) => {
               <Form.Label>EF/Comp</Form.Label>
               <Form.Control
                 value={ef}
-                onChange={handleFormChanges}
-                disabled={efDis}
+                onChange={(event) => {
+                  setEF(event.target.value);
+                }}
                 type="number"
                 step="1"
                 placeholder="0"
@@ -140,31 +337,47 @@ export const InvoiceModal = (props) => {
                 </thead>
               </table>
             </div>
-            <div>
+            {lines.map((li) => {
+              return (
+                <div key={li.Description + li.Product_Service}>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>{li.Description}</td>
+                        <td>{li.Product_Service}</td>
+                        <td>{li.Rate}</td>
+                        <td>{li.Lives}</td>
+                        <td>{li.Amount}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+            {/* <div key="total">
               <table>
                 <tbody>
                   <tr>
-                    <td>Aug 2020 - EE</td>
+                    <td>Total</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td>
-                      <select name="cars" id="cars">
-                        <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="opel">Opel</option>
-                        <option value="audi">Audi</option>
-                      </select>
+                      {lines.reduce(
+                        (a, b) => parseFloat(a.Amount) + parseFloat(b.Amount)
+                      )}
                     </td>
-                    <td>23.54</td>
-                    <td>100</td>
-                    <td>2345.00</td>
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </div> */}
           </div>
-
-          <h4></h4>
-
-          <Button type="button">Submit</Button>
+          <h1></h1>
+          <Form.Row>
+            <div className="MyFormButton">
+              <Button type="button">Submit</Button>
+            </div>
+          </Form.Row>
         </Form>
       </Modal.Body>
       <Modal.Footer></Modal.Footer>
