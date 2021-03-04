@@ -30,9 +30,9 @@ export const InvoiceModal = (props) => {
   const [lines, setLines] = useState([]);
 
   // Total Array
-  const [total, setTotal] = useState("");
+  const [total, setTotal] = useState(0);
 
-  const generate = () => {
+  const createCensusAndRates = () => {
     // Creates and array with filtered policies by customer
     var filteredpolicies = props.policies.filter(
       (policy) => policy.Customer === props.customer
@@ -204,16 +204,30 @@ export const InvoiceModal = (props) => {
     console.log(newLines);
   };
 
-  useInterval(() => {
+  const createComposite = () => {
     const censusValues = [ee, es, ec, ef];
     setCompositeValue(
       String(censusValues.reduce((a, b) => Number(a) + Number(b)))
     );
-    setTotal();
-  }, 1000);
+  };
 
-  useInterval(generate, 1000);
-  useInterval(createLines, 100);
+  const createTotal = () => {
+    var newTotal = 0;
+    if (lines.length) {
+      lines.forEach((line) => {
+        newTotal += Number(line.Amount);
+        console.log(line.Amount);
+      });
+    } else {
+      newTotal = 0;
+    }
+    setTotal(newTotal);
+  };
+
+  useInterval(createComposite, 1000);
+  useInterval(createCensusAndRates, 1000);
+  useInterval(createLines, 1000);
+  useInterval(createTotal, 1000);
 
   return (
     <Modal
@@ -354,7 +368,35 @@ export const InvoiceModal = (props) => {
                 </div>
               );
             })}
-            {/* <div key="total">
+
+            <div key="blanktotal">
+              <table>
+                <tbody>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div key="total">
               <table>
                 <tbody>
                   <tr>
@@ -362,15 +404,11 @@ export const InvoiceModal = (props) => {
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td>
-                      {lines.reduce(
-                        (a, b) => parseFloat(a.Amount) + parseFloat(b.Amount)
-                      )}
-                    </td>
+                    <td>{total}</td>
                   </tr>
                 </tbody>
               </table>
-            </div> */}
+            </div>
           </div>
           <h1></h1>
           <Form.Row>

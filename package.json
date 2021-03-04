@@ -4,12 +4,11 @@
   "version": "0.5.0",
   "private": true,
   "author": "Ruben Dimas",
-  "homepage": "./*",
+  "homepage": "./",
   "build": {
     "files": [
       "./build/**/*",
-      "./node_modules/**/*",
-      "./electron/**/*"
+      "./node_modules/**/*"
     ],
     "directories": {
       "buildResources": "eb_build"
@@ -27,6 +26,7 @@
     "better-sqlite3": "^7.1.1",
     "bootstrap": "^4.5.3",
     "cross-env": "^7.0.3",
+    "electron-devtools-installer": "^3.1.1",
     "electron-is-dev": "^1.2.0",
     "electron-store": "^6.0.1",
     "exceljs": "^4.2.0",
@@ -38,7 +38,7 @@
     "react-scripts": "4.0.1",
     "web-vitals": "^0.2.4"
   },
-  "main": "./electron/main.js",
+  "main": "public/electron.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -46,7 +46,7 @@
     "eject": "react-scripts eject",
     "electron-react-mac": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-react-win": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\" ",
-    "package-win": "electron-builder build --win -c.extraMetadata.main=electron/main.js --publish never"
+    "package-win": "electron-builder build --win -c.extraMetadata.main=build/electron.js --publish never"
   },
   "eslintConfig": {
     "extends": [
@@ -70,7 +70,6 @@
     "concurrently": "^5.3.0",
     "electron": "^11.0.4",
     "electron-builder": "^22.9.1",
-    "electron-devtools-installer": "^3.1.1",
     "electron-rebuild": "^2.3.4",
     "wait-on": "^5.2.1"
   }

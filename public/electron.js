@@ -1,7 +1,7 @@
-const {
-  default: installExtension,
-  REACT_DEVELOPER_TOOLS,
-} = require("electron-devtools-installer");
+// const {
+//   default: installExtension,
+//   REACT_DEVELOPER_TOOLS,
+// } = require("electron-devtools-installer");
 const { app, BrowserWindow } = require("electron");
 const { ipcMain } = require("electron");
 const isDev = require("electron-is-dev");
@@ -10,9 +10,11 @@ const ExcelJS = require("exceljs");
 const https = require("https");
 
 app.whenReady().then(() => {
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log("An error occurred: ", err));
+  // if (isDev) {
+  //   installExtension(REACT_DEVELOPER_TOOLS)
+  //     .then((name) => console.log(`Added Extension:  ${name}`))
+  //     .catch((err) => console.log("An error occurred: ", err));
+  // }
   createWindow();
 });
 
