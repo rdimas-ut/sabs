@@ -44,10 +44,41 @@ class Customer extends Component {
   };
 
   renderInvoices = () => {
+    const { tabState, invoice } = this.props;
     return (
-      <div className="MyContent">
-        {" "}
-        <h1>Invoices state FFU</h1>{" "}
+      <div className="MyTable Invoice">
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Start Date</th>
+                <th>Total Due</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {invoice
+          .filter((inv) => inv.Customer === tabState[2])
+          .map((inv) => {
+            return (
+              <div key={inv.PID}>
+                <table>
+                  <tbody>
+                    <tr
+                      onClick={() => {
+                        console.log("Hello");
+                      }}
+                    >
+                      <td>{myDateDisp(parseInt(inv.InvNum))}</td>
+                      <td>{String(inv.TotalDue)}</td>
+                      <td>{String(inv.Balance)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
       </div>
     );
   };
@@ -122,7 +153,9 @@ class Customer extends Component {
           </table>
         </div>
         {census
-          .filter((cen) => cen.Customer === tabState[2])
+          .filter(
+            (cen) => cen.Customer === tabState[2] && cen.Status === "Actual"
+          )
           .map((cen) => {
             return (
               <div key={cen.CovDate}>
@@ -255,8 +288,12 @@ class Customer extends Component {
           customer={this.props.tabState[2]}
           policies={this.props.policies}
           census={this.props.census}
+          censusinvoice={this.props.censusinvoice}
           feespremium={this.props.feespremium}
           censuspremium={this.props.censuspremium}
+          tabState={this.props.tabState}
+          onCensusInsert={this.props.onCensusInsert}
+          onInvoiceCreate={this.props.onInvoiceCreate}
           show={this.state.invoiceModal}
           onHide={this.hideInvoiceModal}
         />

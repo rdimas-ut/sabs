@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Col } from "react-bootstrap";
-import { myDate } from "./DateHelpers";
+import { myDate, myTime } from "./DateHelpers";
 import { useInterval } from "./CustomerHooks";
 
 export const InvoiceModal = (props) => {
@@ -15,6 +15,10 @@ export const InvoiceModal = (props) => {
   const [es, setES] = useState("");
   const [ec, setEC] = useState("");
   const [ef, setEF] = useState("");
+
+  // New
+  const [newC, setNew] = useState(true);
+  const [validated, setValidated] = useState(false);
 
   // Adjustments in census
   const [adjust, setAdjust] = useState([]);
@@ -28,22 +32,69 @@ export const InvoiceModal = (props) => {
 
   // Line array
   const [lines, setLines] = useState([]);
+  const [adjustlines, setAdjustLines] = useState([]);
 
   // Total Array
   const [total, setTotal] = useState(0);
 
   const createCensusAndRates = () => {
+    var newadjust = [];
+    var adjustment = {};
+
     // Creates and array with filtered policies by customer
     var filteredpolicies = props.policies.filter(
       (policy) => policy.Customer === props.customer
     );
 
     var filteredcensus = props.census.filter(
-      (cen) => cen.Customer === props.customer
+      (cen) => cen.Customer === props.customer && cen.Status === "Actual"
     );
     filteredcensus.sort((a, b) => (a.CovDate < b.CovDate ? 1 : -1));
 
     if (invoicemonth && filteredpolicies.length) {
+      // Finds the adjustments to the past 6 months
+      var filteredcensusactual = filteredcensus;
+
+      var filteredcensusinvoice = props.censusinvoice.filter(
+        (cen) => cen.Customer === props.customer
+      );
+
+      var differences = [0, 0, 0, 0];
+      for (var j = 0; j < filteredcensusactual.length; j++) {
+        differences = [0, 0, 0, 0];
+        for (var i = 0; i < filteredcensusinvoice.length; i++) {
+          differences[0] =
+            filteredcensusactual[j].EE - filteredcensusinvoice[i].EE;
+          differences[1] =
+            filteredcensusactual[j].EC - filteredcensusinvoice[i].EC;
+          differences[2] =
+            filteredcensusactual[j].ES - filteredcensusinvoice[i].ES;
+          differences[3] =
+            filteredcensusactual[j].EF - filteredcensusinvoice[i].EF;
+
+          if (
+            Math.abs(differences[0]) > 0 ||
+            Math.abs(differences[1]) > 0 ||
+            Math.abs(differences[2]) > 0 ||
+            Math.abs(differences[3]) > 0
+          ) {
+            if (
+              filteredcensusactual[j].CovDate ===
+              filteredcensusinvoice[i].CovDate
+            ) {
+              adjustment = {
+                EE: differences[0],
+                EC: differences[1],
+                ES: differences[2],
+                EF: differences[3],
+                CovDate: filteredcensusinvoice[i].CovDate,
+              };
+              newadjust.push(adjustment);
+            }
+          }
+        }
+      }
+
       // filters policies by date which their should only be one or none
       filteredpolicies = filteredpolicies.filter((policy) => {
         var inter = invoicemonth.split("-");
@@ -75,8 +126,12 @@ export const InvoiceModal = (props) => {
       );
       setBillingType(validpolicy.BillingType);
       setPolicy(validpolicy.Carrier + " " + myDate(validpolicy.StartDate));
+
       setFeesPremium(filteredfeespremium);
       setCensusPremium(filteredcensuspremium);
+      setAdjust(newadjust);
+
+      console.log(adjust);
     } else {
       setFeesPremium([]);
       setCensusPremium([]);
@@ -86,6 +141,75 @@ export const InvoiceModal = (props) => {
 
   const createLines = () => {
     var newLines = [];
+    var newAdjustLines = [];
+
+    adjust.forEach((adj) => {
+      if (censuspremium) {
+        censuspremium.forEach((cp) => {
+          if (cp.TierStruc === "1-Tier") {
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - Comp",
+              Product_Service: cp.Type,
+              Rate: cp.EF,
+              Lives: parseInt(adj.EE + adj.EC + adj.ES + adj.EF),
+              Amount: (
+                parseInt(adj.EE + adj.EC + adj.ES + adj.EF) * cp.EF
+              ).toFixed(2),
+            });
+          } else if (cp.TierStruc === "2-Tier") {
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - EE",
+              Product_Service: cp.Type,
+              Rate: cp.EE,
+              Lives: parseInt(adj.EE),
+              Amount: (parseInt(adj.EE) * cp.EE).toFixed(2),
+            });
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - EF",
+              Product_Service: cp.Type,
+              Rate: cp.EF,
+              Lives:
+                parseInt(adj.EE + adj.EC + adj.ES + adj.EF) - parseInt(adj.EE),
+              Amount: (
+                (parseInt(adj.EE + adj.EC + adj.ES + adj.EF) -
+                  parseInt(adj.EE)) *
+                cp.EF
+              ).toFixed(2),
+            });
+          } else if (cp.TierStruc === "4-Tier") {
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - EE",
+              Product_Service: cp.Type,
+              Rate: cp.EE,
+              Lives: parseInt(adj.EE),
+              Amount: (parseInt(adj.EE) * cp.EE).toFixed(2),
+            });
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - ES",
+              Product_Service: cp.Type,
+              Rate: cp.ES,
+              Lives: parseInt(adj.ES),
+              Amount: (parseInt(adj.ES) * cp.ES).toFixed(2),
+            });
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - EC",
+              Product_Service: cp.Type,
+              Rate: cp.EC,
+              Lives: parseInt(adj.EC),
+              Amount: (parseInt(adj.EC) * cp.EC).toFixed(2),
+            });
+            newAdjustLines.push({
+              Description: myDate(adj.CovDate) + " - EF",
+              Product_Service: cp.Type,
+              Rate: cp.EF,
+              Lives: parseInt(adj.EF),
+              Amount: (parseInt(adj.EF) * cp.EF).toFixed(2),
+            });
+          }
+        });
+      }
+    });
+
     if (censuspremium) {
       censuspremium.forEach((cp) => {
         if (cp.TierStruc === "1-Tier") {
@@ -147,7 +271,6 @@ export const InvoiceModal = (props) => {
     }
 
     if (feespremium) {
-      console.log(feespremium);
       feespremium.forEach((fp) => {
         if (fp.Calc === "Flat Fee") {
           newLines.push({
@@ -200,8 +323,9 @@ export const InvoiceModal = (props) => {
         }
       });
     }
+
     setLines(newLines);
-    console.log(newLines);
+    setAdjustLines(newAdjustLines);
   };
 
   const createComposite = () => {
@@ -216,12 +340,111 @@ export const InvoiceModal = (props) => {
     if (lines.length) {
       lines.forEach((line) => {
         newTotal += Number(line.Amount);
-        console.log(line.Amount);
       });
     } else {
       newTotal = 0;
     }
     setTotal(newTotal);
+  };
+
+  const handleSubmit = (event) => {
+    var invData = {};
+    var invLines = [];
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const form = event.currentTarget;
+    const isValid = form.checkValidity();
+    if (isValid) {
+      const params = {
+        Customer: props.customer,
+        EE: Number(ee),
+        ES: Number(es),
+        EC: Number(ec),
+        EF: Number(ef),
+        DTS: Math.floor(Date.now() / 1000),
+        InvDate: myTime(invoicemonth),
+        CovDate: myTime(invoicemonth),
+        Status: "Invoice",
+        User: "No User",
+      };
+      props.onCensusInsert(params, newC, "Invoice");
+      adjust.forEach((adj) => {
+        props.onCensusInsert(
+          {
+            Customer: props.customer,
+            EE: Number(adj.EE),
+            EC: Number(adj.EC),
+            ES: Number(adj.ES),
+            EF: Number(adj.EF),
+            DTS: Math.floor(Date.now() / 1000),
+            InvDate: myTime(invoicemonth),
+            CovDate: adj.CovDate,
+            Status: "Invoice",
+            User: "No User",
+          },
+          newC,
+          "Invoice"
+        );
+      });
+
+      invData = {
+        Customer: props.customer,
+        InvDate: myTime(invoicemonth),
+      };
+
+      lines.forEach((li) => {
+        invLines.push({
+          Description: li.Description,
+          Amount: li.Amount,
+          Qty: li.Lives,
+          UnitPrice: li.Rate,
+        });
+      });
+
+      adjustlines.forEach((ali) => {
+        invLines.push({
+          Description: ali.Description,
+          Amount: ali.Amount,
+          Qty: ali.Lives,
+          UnitPrice: ali.Rate,
+        });
+      });
+
+      props.onInvoiceCreate(invData, invLines);
+
+      handleHide();
+    }
+
+    setValidated(true);
+  };
+
+  const handleReset = () => {
+    setPolicy("");
+    setBillingType("");
+    setInvoiceMonth("");
+
+    setEE("");
+    setES("");
+    setEC("");
+    setEF("");
+
+    setAdjust([]);
+
+    setFeesPremium([]);
+    setCensusPremium([]);
+
+    setCompositeValue([]);
+
+    setLines([]);
+
+    setTotal(0);
+  };
+
+  const handleHide = () => {
+    handleReset();
+    props.onHide();
   };
 
   useInterval(createComposite, 1000);
@@ -231,7 +454,8 @@ export const InvoiceModal = (props) => {
 
   return (
     <Modal
-      {...props}
+      show={props.show}
+      onHide={handleHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -242,7 +466,7 @@ export const InvoiceModal = (props) => {
       </Modal.Header>
 
       <Modal.Body>
-        <Form noValidate>
+        <Form noValidate onSubmit={handleSubmit} validated={validated}>
           <Form.Group controlId="policy">
             <Form.Label>Policy</Form.Label>
             <Form.Control
@@ -277,6 +501,7 @@ export const InvoiceModal = (props) => {
                 setInvoiceMonth(event.target.value);
               }}
               type="month"
+              required
             />
           </Form.Group>
 
@@ -369,6 +594,24 @@ export const InvoiceModal = (props) => {
               );
             })}
 
+            {adjustlines.map((ali) => {
+              return (
+                <div key={ali.Description + ali.Product_Service}>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>{ali.Description}</td>
+                        <td>{ali.Product_Service}</td>
+                        <td>{ali.Rate}</td>
+                        <td>{ali.Lives}</td>
+                        <td>{ali.Amount}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+
             <div key="blanktotal">
               <table>
                 <tbody>
@@ -413,7 +656,9 @@ export const InvoiceModal = (props) => {
           <h1></h1>
           <Form.Row>
             <div className="MyFormButton">
-              <Button type="button">Submit</Button>
+              <Button onClick={handleSubmit} type="button">
+                Submit
+              </Button>
             </div>
           </Form.Row>
         </Form>

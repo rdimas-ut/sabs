@@ -9,6 +9,13 @@ const path = require("path");
 const ExcelJS = require("exceljs");
 const https = require("https");
 
+const sabsazurefunction = "https://sabstestfunc.azurewebsites.net/api/SABSAPP";
+const authazurefunction =
+  "https://sabstestfunc.azurewebsites.net/api/QBORequestAuth";
+
+// const sabsazurefunction = "http://localhost:7071/api/SABSAPP";
+// const authazurefunction = "http://localhost:7071/api/QBORequestAuth";
+
 app.whenReady().then(() => {
   // if (isDev) {
   //   installExtension(REACT_DEVELOPER_TOOLS)
@@ -314,6 +321,19 @@ ipcMain.handle("insert", async (e, tableName, dataDict) => {
   return parsedData;
 });
 
+ipcMain.handle("createInvoice", async (e, invData, invLines) => {
+  console.log("createInvoice");
+  var parsedData;
+  try {
+    parsedData = await createInvoice(invData, invLines);
+  } catch (err) {
+    console.log(err);
+  }
+
+  console.log(parsedData);
+  return parsedData;
+});
+
 ipcMain.handle("delete", async (e, tableName, searchDict) => {
   console.log("delete");
   var parsedData;
@@ -350,15 +370,11 @@ ipcMain.handle("qbo", async (e, apiCallName) => {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        const { statusCode } = res;
-        console.log(statusCode);
-        resolve(statusCode);
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      const { statusCode } = res;
+      console.log(statusCode);
+      resolve(statusCode);
+    });
 
     req.end();
     req.on("error", (err) => {
@@ -389,31 +405,28 @@ ipcMain.handle("qboSignOut", async () => {
 });
 
 ipcMain.handle("qboSignIn", () => {
-  https.get(
-    "https://sabstestfunc.azurewebsites.net/api/QBORequestAuth?",
-    (res) => {
-      const { statusCode } = res;
+  https.get(authazurefunction, (res) => {
+    const { statusCode } = res;
 
-      res.setEncoding("utf8");
-      let rawData = "";
-      res.on("data", (chunk) => {
-        console.log(`BODY: ${chunk}`);
-        rawData += chunk;
-      });
+    res.setEncoding("utf8");
+    let rawData = "";
+    res.on("data", (chunk) => {
+      console.log(`BODY: ${chunk}`);
+      rawData += chunk;
+    });
 
-      res.on("end", () => {
-        const winAuth = new BrowserWindow({
-          width: 680,
-          height: 800,
-          webPreferences: {
-            nodeIntegration: false,
-          },
-          icon: "./electron/icon.png",
-        });
-        winAuth.loadURL(rawData);
+    res.on("end", () => {
+      const winAuth = new BrowserWindow({
+        width: 680,
+        height: 800,
+        webPreferences: {
+          nodeIntegration: false,
+        },
+        icon: "./electron/icon.png",
       });
-    }
-  );
+      winAuth.loadURL(rawData);
+    });
+  });
 });
 
 function createWindow() {
@@ -424,7 +437,7 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
-    icon: "./electron/icon.png",
+    icon: "icon",
   });
 
   if (isDev) {
@@ -444,26 +457,25 @@ function getStateRequest() {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        let rawData = "";
-        res.setEncoding("utf-8");
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
+    console.log(reqOptions);
 
-        res.on("end", () => {
-          try {
-            parsedData = JSON.parse(rawData);
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      let rawData = "";
+      res.setEncoding("utf-8");
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+
+      res.on("end", () => {
+        try {
+          console.log(rawData);
+          parsedData = JSON.parse(rawData);
+          resolve(parsedData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
 
     req.end();
 
@@ -483,16 +495,12 @@ function revokeTokens() {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        const { statusCode } = res;
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      const { statusCode } = res;
 
-        console.log(statusCode);
-        resolve(statusCode);
-      }
-    );
+      console.log(statusCode);
+      resolve(statusCode);
+    });
 
     req.end();
     req.on("error", (err) => {
@@ -511,25 +519,60 @@ function execute(commd) {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            parsedData = JSON.parse(rawData);
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      res.setEncoding("utf8");
+      let rawData = "";
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+      res.on("end", () => {
+        try {
+          parsedData = JSON.parse(rawData);
+          resolve(parsedData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
+
+    req.end();
+
+    req.on("error", (err) => {
+      reject(err);
+    });
+  });
+}
+
+function createInvoice(invData, invLines) {
+  return new Promise((resolve, reject) => {
+    reqOptions = {
+      method: "GET",
+      headers: {
+        call: "createInvoice",
+        parameters: JSON.stringify({
+          invData: invData,
+          invLines: invLines,
+        }),
+      },
+    };
+
+    console.log(reqOptions);
+
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      res.setEncoding("utf8");
+      let rawData = "";
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+      res.on("end", () => {
+        try {
+          console.log(rawData);
+          resolve(rawData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
 
     req.end();
 
@@ -552,25 +595,21 @@ function insert(tableName, dataDict) {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            resolve(rawData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      res.setEncoding("utf8");
+      let rawData = "";
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+      res.on("end", () => {
+        try {
+          console.log(rawData);
+          resolve(rawData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
 
     req.end();
 
@@ -593,25 +632,21 @@ function delete_db(tableName, searchDict) {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      res.setEncoding("utf8");
+      let rawData = "";
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+      res.on("end", () => {
+        try {
+          console.log(rawData);
+          resolve(parsedData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
 
     req.end();
 
@@ -635,26 +670,22 @@ function update(tableName, dataDict, searchDict) {
       },
     };
 
-    let req = https.request(
-      "https://sabstestfunc.azurewebsites.net/api/SABSAPP",
-      reqOptions,
-      (res) => {
-        res.setEncoding("utf8");
-        let rawData = "";
-        res.on("data", (chunk) => {
-          rawData += chunk;
-        });
-        res.on("end", () => {
-          try {
-            console.log(rawData);
-            parsedData = JSON.parse(rawData);
-            resolve(parsedData);
-          } catch (err) {
-            console.error(err.message);
-          }
-        });
-      }
-    );
+    let req = https.request(sabsazurefunction, reqOptions, (res) => {
+      res.setEncoding("utf8");
+      let rawData = "";
+      res.on("data", (chunk) => {
+        rawData += chunk;
+      });
+      res.on("end", () => {
+        try {
+          console.log(rawData);
+          parsedData = JSON.parse(rawData);
+          resolve(parsedData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      });
+    });
 
     req.end();
 

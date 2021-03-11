@@ -50,6 +50,17 @@
   cursor: pointer;
 } */
 
+.Invoice div table thead th,
+.Invoice div table tbody td {
+  width: 33%;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.Invoice div table tbody tr {
+  cursor: pointer;
+}
+
 .Customers div table thead th,
 .Customers div table tbody td {
   width: 33%;

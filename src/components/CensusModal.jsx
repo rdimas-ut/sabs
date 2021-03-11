@@ -58,7 +58,7 @@ export function CensusModal(props) {
         Status: "Actual",
         User: user,
       };
-      props.onCensusInsert(params, newC);
+      props.onCensusInsert(params, newC, "Actual");
       handleHide();
     }
 

@@ -26,6 +26,11 @@ class App extends Component {
     billfees: [],
     items: [],
     accounts: [],
+
+    invoice: [],
+    bill: [],
+    // Customer tables only
+    censusinvoice: [],
     // Tab state as define by two var
     customersTab: ["a", "customers", ""],
     vendorsTab: ["a", "vendors", ""],
@@ -47,6 +52,9 @@ class App extends Component {
     this.getBillFees();
     this.getItems();
     this.getAccounts();
+    this.getCensusInvoice();
+    this.getInvoice();
+    this.getBill();
     this.timerQBO = setInterval(() => this.isUserSignedInToQBO(), 1000);
   }
 
@@ -60,6 +68,13 @@ class App extends Component {
       errorModalTitle: errorTitle,
       errorModalMessage: errorMessage,
     });
+  };
+
+  handleInvoiceCreate = async (invData, invLines) => {
+    await ipcRenderer.invoke("createInvoice", invData, invLines);
+    this.getCensus();
+    this.getCensusInvoice();
+    this.getInvoice();
   };
 
   hideErrorModal = () => {
@@ -112,12 +127,23 @@ class App extends Component {
     }
   };
 
-  handleCensusInsert = async (Params, New) => {
-    var commd =
-      'select EE, ES, EC, EF from Census where Status = "Actual" and Customer = "' +
-      Params.Customer +
-      '" and CovDate = ';
-    commd += String(Params.CovDate);
+  handleCensusInsert = async (Params, New, Status) => {
+    if (Status === "Actual") {
+      var commd =
+        'select EE, ES, EC, EF from Census where Status = "Actual" and Customer = "' +
+        Params.Customer +
+        '" and CovDate = ';
+      commd += String(Params.CovDate);
+    } else if (Status === "Invoice") {
+      var commd =
+        'select EE, ES, EC, EF from Census where Status = "Invoice" and Customer = "' +
+        Params.Customer +
+        '" and CovDate = ';
+      commd += String(Params.CovDate);
+      commd += " and InvDate = ";
+      commd += String(Params.InvDate);
+    }
+
     console.log(commd);
     const CensusByDate = await ipcRenderer.invoke("execute", commd);
     const res = CensusByDate.res;
@@ -136,6 +162,7 @@ class App extends Component {
     } else {
       await ipcRenderer.invoke("insert", "CensusLog", Params);
       await this.getCensus();
+      await this.getCensusInvoice();
     }
   };
 
@@ -285,6 +312,40 @@ class App extends Component {
     }
   };
 
+  getCensusInvoice = async () => {
+    console.log("getCensusInvoice");
+    const commd =
+      'select "Customer", sum(EE) as EE, sum(ES) as ES, sum(EC) as EC, sum(EF) as EF, CovDate from "CensusLog"  where Status = "Invoice" group by "Customer", CovDate';
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ censusinvoice: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getInvoice = async () => {
+    console.log("getInvoice");
+    const commd = "select * from Invoice";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ invoice: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getBill = async () => {
+    console.log("getBill");
+    const commd = "select * from Bill";
+    try {
+      const result = await ipcRenderer.invoke("execute", commd);
+      this.setState({ bill: result.res });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   isUserSignedInToQBO = () => {
     const { appstate } = this.state;
     try {
@@ -320,8 +381,11 @@ class App extends Component {
       vendorsTab,
       items,
       accounts,
+      censusinvoice,
+      invoice,
     } = this.state;
     const cProps = {
+      invoice,
       policies,
       vendors,
       customers,
@@ -331,7 +395,9 @@ class App extends Component {
       feespremium,
       items,
       accounts,
+      censusinvoice,
       tabState: customersTab,
+      onInvoiceCreate: this.handleInvoiceCreate,
       onTabContent: this.handleTabContent,
       onCensusInsert: this.handleCensusInsert,
       onPolicyInsert: this.handlePolicyInsert,
