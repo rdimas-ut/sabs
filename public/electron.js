@@ -16,6 +16,8 @@ const authazurefunction =
 // const sabsazurefunction = "http://localhost:7071/api/SABSAPP";
 // const authazurefunction = "http://localhost:7071/api/QBORequestAuth";
 
+const iconpath = require("path");
+
 app.whenReady().then(() => {
   // if (isDev) {
   //   installExtension(REACT_DEVELOPER_TOOLS)
@@ -437,7 +439,7 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
-    icon: "icon",
+    icon: iconpath.join(__dirname, "icon.png"),
   });
 
   if (isDev) {
