@@ -6,7 +6,7 @@ import { Col } from "react-bootstrap";
 import { myDate, myTime } from "./DateHelpers";
 import { useInterval } from "./CustomerHooks";
 
-export const InvoiceModal = (props) => {
+export const BillModal = (props) => {
   const [policy, setPolicy] = useState("");
   const [billingtype, setBillingType] = useState("");
   const [invoicemonth, setInvoiceMonth] = useState("");

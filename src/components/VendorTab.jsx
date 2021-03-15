@@ -1,15 +1,60 @@
 import React, { Component } from "react";
 import { VendorsNav, VendorNav } from "./TabNavs";
+import { BillModal } from "./BillModal";
+import { myDateDisp } from "./DateHelpers";
 
 class Vendor extends Component {
-  state = {};
+  state = {
+    billModal: false,
+    selectedBill: "",
+  };
 
   renderBills = () => {
+    const { tabState, bill } = this.props;
     return (
-      <div className="MyContent">
-        <h1>Bills state FFU</h1>
+      <div className="MyTable Invoice">
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Start Date</th>
+                <th>Total Due</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        {bill
+          .filter((bi) => bi.Customer === tabState[2])
+          .map((bi) => {
+            return (
+              <div key={bi.BID}>
+                <table>
+                  <tbody>
+                    <tr
+                      onClick={() => {
+                        console.log("Hello");
+                      }}
+                    >
+                      <td>{myDateDisp(parseInt(bi.BillNum))}</td>
+                      <td>{String(bi.TotalDue)}</td>
+                      <td>{String(bi.Balance)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
       </div>
     );
+  };
+
+  showBillModal = () => {
+    this.setState({ billModal: true });
+  };
+
+  hideBillModal = () => {
+    this.setState({ billModal: false, selectedBill: "" });
   };
 
   renderVendors = () => {
@@ -65,13 +110,30 @@ class Vendor extends Component {
           <VendorsNav onTabContent={onTabContent} tabState={tabState} />
         )}
         {tabState[0] === "b" && (
-          <VendorNav onTabContent={onTabContent} tabState={tabState} />
+          <VendorNav
+            showBillModal={this.showBillModal}
+            onTabContent={onTabContent}
+            tabState={tabState}
+          />
         )}
 
         {tabState[0] === "a" &&
           tabState[1] === "vendors" &&
           this.renderVendors()}
         {tabState[0] === "b" && tabState[1] === "bills" && this.renderBills()}
+        <BillModal
+          customer={this.props.tabState[2]}
+          policies={this.props.policies}
+          census={this.props.census}
+          censusinvoice={this.props.censusinvoice}
+          feespremium={this.props.feespremium}
+          censuspremium={this.props.censuspremium}
+          tabState={this.props.tabState}
+          onCensusInsert={this.props.onCensusInsert}
+          onInvoiceCreate={this.props.onInvoiceCreate}
+          show={this.state.billModal}
+          onHide={this.hideBillModal}
+        />
       </React.Fragment>
     );
   }

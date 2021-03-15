@@ -383,6 +383,7 @@ class App extends Component {
       accounts,
       censusinvoice,
       invoice,
+      bill,
     } = this.state;
     const cProps = {
       invoice,
@@ -408,6 +409,16 @@ class App extends Component {
       vendors,
       onTabContent: this.handleTabContent,
       tabState: vendorsTab,
+
+      bill,
+
+      policies,
+      census,
+      censusinvoice,
+      feespremium,
+      censuspremium,
+      onCensusInsert: this.handleCensusInsert,
+      onInvoiceCreate: this.handleInvoiceCreate,
     };
 
     const qboButtons = {

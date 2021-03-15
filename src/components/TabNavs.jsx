@@ -169,6 +169,16 @@ export const VendorNav = (props) => {
             Back
           </button>
         </li>
+        {
+          <li className="nav-item ml-auto">
+            <button
+              className="btn btn-primary MyNavBarButton"
+              onClick={props.showBillModal}
+            >
+              New
+            </button>
+          </li>
+        }
       </ul>
     </div>
   );
