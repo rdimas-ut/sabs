@@ -8,6 +8,7 @@ const isDev = require("electron-is-dev");
 const path = require("path");
 const ExcelJS = require("exceljs");
 const https = require("https");
+// const http = require("http");
 
 const sabsazurefunction = "https://sabstestfunc.azurewebsites.net/api/SABSAPP";
 const authazurefunction =
@@ -424,7 +425,7 @@ ipcMain.handle("qboSignIn", () => {
         webPreferences: {
           nodeIntegration: false,
         },
-        icon: "./electron/icon.png",
+        icon: iconpath.join(__dirname, "icon.png"),
       });
       winAuth.loadURL(rawData);
     });
