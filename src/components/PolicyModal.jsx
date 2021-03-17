@@ -656,6 +656,13 @@ export const PolicyModal = (props) => {
           <h4>Premium Fees</h4>
 
           {premfees.map((pf, i) => {
+            var pfreq = false;
+            pfreq =
+              Boolean(pf.vendor) ||
+              Boolean(pf.product) ||
+              Boolean(pf.calc) ||
+              Boolean(pf.rate);
+
             return (
               <div key={pf.id}>
                 <Form.Row className="premfeesdetails">
@@ -675,6 +682,7 @@ export const PolicyModal = (props) => {
                       }
                       type="text"
                       placeholder="Vendor"
+                      required={pfreq}
                     />
                   </Form.Group>
                   <Form.Group as={Col} md="3" controlId={pf.id}>
@@ -693,6 +701,7 @@ export const PolicyModal = (props) => {
                       }
                       type="text"
                       placeholder="Procuct"
+                      required={pfreq}
                       as="select"
                       className="mr-sm-2"
                       custom
@@ -720,6 +729,7 @@ export const PolicyModal = (props) => {
                       type="text"
                       as="select"
                       placeholder="Calculation Method"
+                      required={pfreq}
                       className="mr-sm-2"
                       custom
                     >
@@ -759,6 +769,7 @@ export const PolicyModal = (props) => {
                       type="number"
                       step=".01"
                       placeholder="Rate"
+                      required={pfreq}
                     />
                   </Form.Group>
                   {i === premfees.length - 1 && (
@@ -793,6 +804,14 @@ export const PolicyModal = (props) => {
           <h4>Vendor Fees</h4>
 
           {billfees.map((bf, i) => {
+            var bfpreq = false;
+
+            bfpreq =
+              Boolean(bf.vendor) ||
+              Boolean(bf.product) ||
+              Boolean(bf.calc) ||
+              Boolean(bf.rate);
+
             return (
               <div key={bf.id}>
                 <Form.Row className="MyFormRow">
@@ -812,6 +831,7 @@ export const PolicyModal = (props) => {
                       }
                       type="text"
                       placeholder="Vendor"
+                      required={bfpreq}
                       as="select"
                       className="mr-sm-2"
                       custom
@@ -840,6 +860,7 @@ export const PolicyModal = (props) => {
                       }
                       type="text"
                       placeholder="Procuct"
+                      required={bfpreq}
                       as="select"
                       className="mr-sm-2"
                       custom
@@ -868,6 +889,7 @@ export const PolicyModal = (props) => {
                       }
                       type="text"
                       placeholder="Calculation Method"
+                      required={bfpreq}
                       as="select"
                       className="mr-sm-2"
                       custom
@@ -914,6 +936,7 @@ export const PolicyModal = (props) => {
                       type="number"
                       step=".01"
                       placeholder="Rate"
+                      required={bfpreq}
                     />
                   </Form.Group>
                   {i === billfees.length - 1 && (

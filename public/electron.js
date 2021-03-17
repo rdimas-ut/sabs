@@ -10,9 +10,13 @@ const ExcelJS = require("exceljs");
 const https = require("https");
 // const http = require("http");
 
-const sabsazurefunction = "https://sabstestfunc.azurewebsites.net/api/SABSAPP";
+// const sabsazurefunction = "https://sabstestfunc.azurewebsites.net/api/SABSAPP";
+// const authazurefunction =
+//   "https://sabstestfunc.azurewebsites.net/api/QBORequestAuth";
+
+const sabsazurefunction = "https://sabsdemo.azurewebsites.net/api/SABSAPP?";
 const authazurefunction =
-  "https://sabstestfunc.azurewebsites.net/api/QBORequestAuth";
+  "https://sabsdemo.azurewebsites.net/api/QBORequestAuth?";
 
 // const sabsazurefunction = "http://localhost:7071/api/SABSAPP";
 // const authazurefunction = "http://localhost:7071/api/QBORequestAuth";
@@ -530,6 +534,8 @@ function execute(commd) {
       });
       res.on("end", () => {
         try {
+          console.log(commd);
+          console.log(rawData);
           parsedData = JSON.parse(rawData);
           resolve(parsedData);
         } catch (err) {

@@ -4,14 +4,14 @@
   "version": "0.6.0",
   "private": true,
   "author": "Ruben Dimas",
-  "homepage": "./*",
+  "homepage": "./",
   "build": {
     "files": [
       "./build/**/*",
       "./node_modules/**/*"
     ],
     "directories": {
-      "buildResources": "eb_build"
+      "buildResources": "assets"
     },
     "publish": {
       "provider": "github",

@@ -205,6 +205,7 @@ class App extends Component {
   };
 
   getState = async () => {
+    console.log("geState");
     try {
       const result = await ipcRenderer.invoke("getState");
       this.setState({ appstate: result });
